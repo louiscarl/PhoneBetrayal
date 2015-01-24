@@ -1,6 +1,6 @@
 
 // Socket.io
-var socket = io.connect('http://localhost:3000');
+var socket = io.connect();
 console.log("id", socket);
 
 // Angular
