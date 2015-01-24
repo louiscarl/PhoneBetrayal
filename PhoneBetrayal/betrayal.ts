@@ -1,4 +1,3 @@
-
 // Socket.io
 var socket = io.connect();
 console.log("id", socket);
