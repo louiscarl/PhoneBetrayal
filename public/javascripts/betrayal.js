@@ -64,7 +64,7 @@ angular.module('betrayalApp', [])
             socket.emit('name', {"name":name});
         }
     
-        socket.emit('join', function(data){
+        socket.emit('join', {}, function(data){
             // Join the game, get our player id back
             console.log("joined", data);
             $scope.playerId = data.player.id;

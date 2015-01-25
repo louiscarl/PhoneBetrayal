@@ -18,7 +18,7 @@ var deckActions = {
     "ROBOT": "KILL A HUMAN",
     "ROBO-MINION": "ASSOCIATE WITH ANOTHER ACTIVATED ROBOT",
     "THE-BOMB":"BLOW UP YOURSELF AND PLAYER, SUCCEED IF IT'S A HUMAN",
-    "CHILD": "HUG A LIVE HUMAN",
+    "CHILD": "HUG A LIVE HUMAN (SECRET)",
     "REBEL": "KILL A PLAYER AND STAY ALIVE",
     "SNAKE": "DIE, THEN KILL THE PLAYER WHO KILLED YOU",
     "TWIN":"FIND YOUR TWIN (THEY CAN ALSO FIND YOU)",
@@ -123,8 +123,12 @@ exports.join = function(uuid, cb){
             score: 0
         };
         playerToGame[player.id] = game.id;
+    } else {
+        // Skip adding it to the group
+        console.log("Player already exists")
+        return cb(null, {game:game});
     }
-    if(_.where(game.players, {state:'active'}).length >= maxPlayers) player.state = 'spectating';
+    // if(_.where(game.players, {state:'active'}).length >= maxPlayers) player.state = 'spectating';
 
     players.push(player); // All players
     game.players.push(player); // Players for the game
@@ -264,7 +268,6 @@ exports.playRole = function(playerId, target, cb){
             targetPlayer.state = 'dead';
             roleMessages.push({"role":player.role, "message":"You killed " + targetPlayer.name});
             roleMessages.push({"role":targetPlayer.role, "message":"A ROBOT killed you "});
-            // Subtract 15 seconds from the timer?
             break;
         case "ROBO-MINION":
             if(robots.indexOf(targetPlayer.role) != -1 && targetPlayer.state == 'active'){
