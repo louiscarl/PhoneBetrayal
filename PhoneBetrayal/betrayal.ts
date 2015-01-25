@@ -55,12 +55,15 @@ module Betrayal {
 
         $scope.playerName = gameService.name;
 
+        $scope.hasError = false;
+
         $scope.isDisabled = false;
 
         $scope.joinGame = function () {
             if (!$scope.joinAttempted && ($scope.playerName.length >= 2)) {
                 $scope.joinAttempted = true;
                 $scope.isDisabled = true;
+                $scope.hasError = false;
                 gameService.setName($scope.playerName);
                 gameService.joinGame();
             }
@@ -69,8 +72,14 @@ module Betrayal {
         gameService.setGameChangedCallback(function () {
             if ($scope.joinAttempted) {
                 $scope.joinAttempted = false;
-                gameService.setGameChangedCallback(null);
-                location.hash = "#/lobby/" + gameService.game.id;
+
+                if (gameService.isConnected) {
+                    gameService.setGameChangedCallback(null);
+                    location.hash = "#/lobby/" + gameService.game.id;
+                } else {
+                    $scope.hasError = true;
+                    $scope.$digest();
+                }
             }
         });
     }]);

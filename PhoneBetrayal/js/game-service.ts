@@ -29,10 +29,13 @@ module Betrayal {
 
         hasStarted: boolean;
 
+        isConnected: boolean;
+
         private cookieStore: ng.cookies.ICookieStoreService;
 
         constructor(socket: SocketIOClient.Socket, cookieStore: ng.cookies.ICookieStoreService) {
             this.hasStarted = false;
+            this.isConnected = false;
             this.playerId = null;
             this.cookieStore = cookieStore;
             this.socket = socket;
@@ -151,8 +154,16 @@ module Betrayal {
             this.socket.emit('name', { "name": this.name });
             // Join the game, get our player id back
             console.log("joined", data);
-            this.playerId = data.player.id;
-            this.loadGame(data.game);
+            if (data.player) {
+                this.playerId = data.player.id;
+                this.isConnected = true;
+                this.loadGame(data.game);
+            } else {
+                // let the UI know we failed to connect
+                if (this.gameChangedCallback) {
+                    this.gameChangedCallback();
+                }
+            }
             // gameService.loadPlayer(data.player);
         }
 
