@@ -1,0 +1,40 @@
+extends layout
+
+block content
+  .container(ng-controller='GameCtrl')
+    //- The Players 
+    .row.center-block.players
+      .col-md-4
+        .col-md-12(ng-repeat='p in game.players' ng-if='p != player')
+          .panel.panel-default
+            .panel-heading
+                | {{p.name}}
+                span.glyphicon.glyphicon-heart(ng-repeat='a in range(p.lives) track by $index')
+              .panel-body
+                .row
+                  span(ng-if='game.state == "ended"') {{p.role}}
+      .col-md-8
+        .col-md-4
+          .panel.panel-default.timer
+            .panel-heading
+              h2 Timer
+            .panel-body
+              h1 {{game.timer}}
+    //- Player Info/Hand 
+    nav.navbar.navbar-default.navbar-fixed-bottom(role='navigation')
+      .container.player
+        .row
+          .col-md-8.col-md-offset-2
+            .panel.panel-default(ng-class="{ 'panel-success': game.players[game.turn] == player } ")
+              .panel-heading
+                | {{player.name}} - {{player.role}}
+                | Lives:
+                span.glyphicon.glyphicon-heart(ng-repeat='a in range(player.lives) track by $index')
+              .panel-body
+                a.col-md-2(href='#', ng-click='playRole($index)', ng-repeat='p in game.players track by $index')
+                  span(ng-click='setName(prompt("Enter a name:"))') {{p.name}}
+          .col-md-2
+            a.btn.btn-primary.btn-block(ng-if='game.state == "prep"', href='', ng-click='startGame()') Start
+            a.btn.btn-primary.btn-block(ng-if='game.state == "active"', href='', ng-click='endRound()') End
+            a.btn.btn-primary.btn-block(ng-if='game.state == "ended"', href='', ng-click='startGame()') Next
+block scripts
