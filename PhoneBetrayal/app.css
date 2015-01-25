@@ -10,9 +10,13 @@ h1 {
   font-size: 50px;
   margin: 10px 0px;
   text-align: center;
+  text-shadow: 2px 0px 2px #1a9481;
+  -webkit-animation: text_in 1s;
 }
 h2 {
   padding-left: 10px;
+  text-shadow: 2px 0px 2px #1a9481;
+  -webkit-animation: text_in 1s;
 }
 .background {
   background: -webkit-linear-gradient(270deg, #002c4b 90%, #1a9481 100%);
@@ -57,6 +61,7 @@ button {
   width: 300px;
   height: 20px;
   margin: 5px;
+  -webkit-animation: text_in 1s;
 }
 button {
   background-color: #002c4b;
@@ -66,6 +71,7 @@ button {
   box-shadow: 2px 0px 2px #9bcc93;
   width: 324px;
   height: 40px;
+  -webkit-animation: button_in 1s;
 }
 input:focus,
 button:focus {
@@ -135,6 +141,23 @@ button:focus {
   top: 0px;
   opacity: 0.1;
 }
-.section {
-  border-top: 1px solid #9bcc93;
+@-webkit-keyframes text_in {
+  0% {
+    text-shadow: 50px 0px 20px #002c4b;
+    opacity: 0.5;
+  }
+  100% {
+    text-shadow: 2px 0px 2px #1a9481;
+    opacity: 1;
+  }
+}
+@-webkit-keyframes button_in {
+  0% {
+    text-shadow: 50px 0px 20px #002c4b;
+    opacity: 0.5;
+  }
+  100% {
+    text-shadow: 2px 0px 2px #9bcc93;
+    opacity: 1;
+  }
 }

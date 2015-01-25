@@ -16,10 +16,14 @@ h1 {
 	font-size: 50px;
 	margin: 10px 0px;
     text-align: center;
+    text-shadow: 2px 0px 2px @screen-foreground;
+    -webkit-animation: text_in 1s;
 }
 
 h2 {
     padding-left: 10px;
+    text-shadow: 2px 0px 2px @screen-foreground;
+    -webkit-animation: text_in 1s;
 }
 
 .background {
@@ -66,6 +70,7 @@ input, button {
 	width: 300px;
 	height: 20px;
 	margin: 5px;
+    -webkit-animation: text_in 1s;
 }
 
 button {
@@ -76,6 +81,7 @@ button {
     box-shadow: 2px 0px 2px @screen-highlight;
 	width: 324px;
 	height: 40px;
+    -webkit-animation: button_in 1s;
 }
 
 input:focus, button:focus {
@@ -160,4 +166,30 @@ input:focus, button:focus {
 }
 
 .section {
+}
+
+@-webkit-keyframes text_in {
+    0% {
+        text-shadow: 50px 0px 20px @screen-background;
+        opacity: 0.5;
+    }
+
+    100% {
+        text-shadow: 2px 0px 2px @screen-foreground;
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes button_in {
+    0% {
+        text-shadow: 50px 0px 20px @screen-background;
+        box-shadow: 50px 0px 20px @screen-background;
+        opacity: 0.5;
+    }
+
+    100% {
+        text-shadow: 2px 0px 2px @screen-highlight;
+        box-shadow: 2px 0px 2px @screen-highlight;
+        opacity: 1;
+    }
 }
