@@ -3,5 +3,5 @@
     <ul>
         <li ng-repeat="p in players track by $index">{{ p.name }}</li>
     </ul>
-    <button ng-click='startGame()'>Start Game</button>
+    <button ng-click='startGame()' ng-disabled="isDisabled">Start Game</button>
 </div>

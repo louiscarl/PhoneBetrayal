@@ -3,7 +3,7 @@
 		<h1>Enter Name</h1>
 		<form name="joinForm" ng-submit="joinGame()">
             <input type="text" ng-model="playerName" ng-minlength="2" ng-maxlength="14" required />
-            <button type="submit">Join</button>
+            <button type="submit" ng-disabled="isDisabled">Join</button>
 		</form>
 	</div>
 </div>

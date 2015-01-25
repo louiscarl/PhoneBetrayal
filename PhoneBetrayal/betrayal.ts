@@ -38,14 +38,6 @@ module Betrayal {
     betrayalApp.factory('gameService', ['$cookieStore', function ($cookieStore: ng.cookies.ICookieStoreService) {
         var gameService = new Betrayal.GameService(socket, $cookieStore);
 
-        socket.emit('join', function (data : Betrayal.Server.IJoinResponseData) {
-            // Join the game, get our player id back
-            console.log("joined", data);
-            gameService.playerId = data.player.id;
-            gameService.loadGame(data.game);
-            // gameService.loadPlayer(data.player);
-        });
-
         socket.on('game', function (gameData : Betrayal.Server.IGame) {
             console.log("gameData received");
             gameService.loadGame(gameData);
@@ -59,10 +51,14 @@ module Betrayal {
 
         $scope.playerName = gameService.name;
 
+        $scope.isDisabled = false;
+
         $scope.joinGame = function () {
             if (!$scope.joinAttempted && ($scope.playerName.length >= 2)) {
                 $scope.joinAttempted = true;
+                $scope.isDisabled = true;
                 gameService.setName($scope.playerName);
+                gameService.joinGame();
             }
         };
 
@@ -77,6 +73,8 @@ module Betrayal {
     betrayalApp.controller('LobbyCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
         $scope.players = gameService.game.players;
 
+        $scope.isDisabled = $scope.players.length < 2;
+
         $scope.startGame = function () {
             gameService.startGame();
         };
@@ -86,6 +84,7 @@ module Betrayal {
         });
 
         gameService.setGameChangedCallback(function () {
+            $scope.isDisabled = $scope.players.length < 2;
             $scope.$digest();
         });
     }]);

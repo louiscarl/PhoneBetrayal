@@ -13,6 +13,10 @@ var Betrayal;
             this.name = cookieStore.get(GameServiceConstants.playerNameCookie) || "";
         }
         GameService.prototype.loadGame = function (gameData) {
+            if (this.playerId === null) {
+                // ignore until we've joined
+                return;
+            }
             this.game = gameData;
             console.log("Game is now", this.game);
             for (var x in this.game.players) {
@@ -64,8 +68,18 @@ var Betrayal;
                     console.log(err);
             });
         };
+        GameService.prototype.onGameJoined = function (data) {
+            this.socket.emit('name', { "name": this.name });
+            // Join the game, get our player id back
+            console.log("joined", data);
+            this.playerId = data.player.id;
+            this.loadGame(data.game);
+            // gameService.loadPlayer(data.player);
+        };
+        GameService.prototype.joinGame = function () {
+            this.socket.emit('join', this.onGameJoined.bind(this));
+        };
         GameService.prototype.setName = function (name) {
-            this.socket.emit('name', { "name": name });
             if (this.name !== name) {
                 this.name = name;
                 this.cookieStore.put(GameServiceConstants.playerNameCookie, name);

@@ -34,6 +34,11 @@ module Betrayal {
         }
 
         loadGame(gameData: Betrayal.Server.IGame) {
+            if (this.playerId === null) {
+                // ignore until we've joined
+                return;
+            }
+
             this.game = gameData;
             console.log("Game is now", this.game);
             for (var x in this.game.players) {
@@ -93,8 +98,20 @@ module Betrayal {
 
         }
 
+        private onGameJoined(data: Betrayal.Server.IJoinResponseData) {
+            this.socket.emit('name', { "name": this.name });
+            // Join the game, get our player id back
+            console.log("joined", data);
+            this.playerId = data.player.id;
+            this.loadGame(data.game);
+            // gameService.loadPlayer(data.player);
+        }
+
+        joinGame() {
+            this.socket.emit('join', this.onGameJoined.bind(this));
+        }
+
         setName(name : string) {
-            this.socket.emit('name', { "name": name });
             if (this.name !== name) {
                 this.name = name;
                 this.cookieStore.put(GameServiceConstants.playerNameCookie, name);
