@@ -106,5 +106,38 @@ input:focus, button:focus {
 }
 
 .timer_urgent {
-	color: @screen-highlight
+	color: @screen-highlight;
+}
+
+.timer_blink {
+    animation: urgent 0.5s infinite linear;
+    -webkit-animation: urgent 0.5s infinite linear;
+}
+
+@-webkit-keyframes urgent {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes urgent {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }

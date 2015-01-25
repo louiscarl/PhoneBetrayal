@@ -1,12 +1,19 @@
 ﻿<div ng-controller="PlayingCtrl">
-	<div class="content">
-		<h1 id="timer_display">00:00</h1>
-		<div>News</div>
-		<div>Role</div>
-		<div>Action</div>
-		<div>Players</div>
-	</div>
-	<script>
-		timer();
-	</script>
+	<h1 id="timer_display">00:00</h1>
+    <div><h3>News</h3>
+        <ul>
+            <li ng-repeat="m in messages">{{ m }}</li>
+        </ul>
+    </div>
+    <div><h3>Role</h3>
+        <div>{{role}}</div>
+    </div>
+    <div><h3>Action</h3>
+        <button ng-disabled="isActionDisabled" ng-click="doAction('')">{{action}}</button>
+    </div>
+    <div><h3>Players</h3>
+        <ul>
+            <li ng-repeat="p in otherPlayers track by $index"><button ng-disabled="p.isTargetDisabled" ng-click="doAction(p.id)">{{p.name}}<span ng-hide="p.isAlive">(dead)</span></button></li>
+        </ul>
+    </div>
 </div>

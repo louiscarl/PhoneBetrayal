@@ -35,6 +35,10 @@ function timerTick() {
 
     if (minutes === 0) {
         timer_displ.className = 'timer_urgent';
+
+        if (seconds < 20) {
+            timer_displ.className = 'timer_urgent timer_blink';
+        }
     }
 
     setTimeout(timerTick, 100);

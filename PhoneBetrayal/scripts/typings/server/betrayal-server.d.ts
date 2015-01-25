@@ -7,7 +7,6 @@
         lives: number;
         state: string;
         score: number;
-        hand: Array<string>;
     }
 
     interface IGame {
@@ -15,11 +14,16 @@
         timer: number;
         players: Array<IPlayer>;
         state: string;
-        deskActions: Map<string, string>;
+        deckActions: Map<string, string>;
     }
 
     interface IJoinResponseData {
         game: IGame;
         player: IPlayer;
+    }
+
+    interface IMessageData {
+        role: string;
+        message: string;
     }
 }
