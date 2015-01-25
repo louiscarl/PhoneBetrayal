@@ -4,8 +4,7 @@ module Betrayal {
     };
 
     var TargetNotNeeded = [
-        "ROBOT",
-        "GUARDIAN"
+        "ROBOT"
     ];
 
     // GameService class
@@ -26,9 +25,9 @@ module Betrayal {
 
         private gameChangedCallback: Function;
 
-        private startGameCallback: Function;
+        canAct: boolean;
 
-        private hasStarted: boolean;
+        hasStarted: boolean;
 
         private cookieStore: ng.cookies.ICookieStoreService;
 
@@ -39,6 +38,7 @@ module Betrayal {
             this.socket = socket;
             this.messages = [];
             this.name = cookieStore.get(GameServiceConstants.playerNameCookie) || "";
+            this.onActionErrorCallback = this.onActionError.bind(this);
         }
 
         loadGame(gameData: Betrayal.Server.IGame) {
@@ -61,10 +61,16 @@ module Betrayal {
 
             if (!this.hasStarted && (this.game.state == "active")) {
                 this.hasStarted = true;
-                this.startGameCallback();
-                this.startGameCallback = null;
+                this.canAct = true;
+                this.messages = [];
             } else if (this.hasStarted && (this.game.state == "ended")) {
                 this.hasStarted = false;
+                this.canAct = false;
+            }
+
+            if (this.canAct && (this.player.state !== 'active')) {
+                this.canAct = false;
+                this.messages.unshift("You dead");
             }
 
             if (this.gameChangedCallback) {
@@ -96,24 +102,44 @@ module Betrayal {
             });
         }
 
-        actOnTarget(target: string) {
-            // Get the card
-            console.log("Play role", target);
-            this.socket.emit('playRole', { target: target }, function (err) {
-                if (err) console.log(err);
-            });
+        private onActionErrorCallback: Function;
+        
+        onActionError(err: string) {
+            if (err) {
+                console.log(err);
+                this.messages.unshift(err);
+                this.canAct = true;
 
+                if (this.gameChangedCallback) {
+                    this.gameChangedCallback();
+                }
+            }
+        }
+
+        actOnTarget(target: string) {
+            if (!this.canAct) {
+                return;
+            }
+
+            this.canAct = false;
+
+            // non-targeted effects should target ourselves
+            if (target == '') {
+                target = this.player.id;
+            }
+
+            console.log("Play role", target);
+            this.socket.emit('playRole', { target: target }, this.onActionErrorCallback);
         }
 
         needsTarget(): boolean {
-            return TargetNotNeeded.indexOf(this.player.role) > -1;
+            return TargetNotNeeded.indexOf(this.player.role) < 0;
         }
 
-        onMessage(data: Map<string,string>) {
-            var message = data[this.player.role];
-            if (message) {
+        onMessage(data: Betrayal.Server.IMessageData) {
+            if ((this.hasStarted) && (data.role === this.player.role)) {
                 // Display this message
-                this.messages.unshift(message);
+                this.messages.unshift(data.message);
 
                 if (this.gameChangedCallback) {
                     this.gameChangedCallback();
@@ -139,10 +165,6 @@ module Betrayal {
                 this.name = name;
                 this.cookieStore.put(GameServiceConstants.playerNameCookie, name);
             }                
-        }
-
-        setStartGameCallback(callback: Function) {
-            this.startGameCallback = callback;
         }
 
         setGameChangedCallback(callback: Function) {

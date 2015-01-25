@@ -1,5 +1,5 @@
 ﻿<div ng-controller="PlayingCtrl">
-    <h2>Time</h2>
+    <h2>{{roundTime}}</h2>
     <div><h3>News</h3>
         <ul>
             <li ng-repeat="m in messages">{{ m }}</li>
@@ -9,11 +9,11 @@
         <div>{{role}}</div>
     </div>
     <div><h3>Action</h3>
-        <button ng-disabled="!canAct || requiresTarget" ng-click="doAction('')">{{action}}</button>
+        <button ng-disabled="isActionDisabled" ng-click="doAction('')">{{action}}</button>
     </div>
     <div><h3>Players</h3>
         <ul>
-            <li ng-repeat="p in otherPlayers track by $index"><button ng-disabled="!canAct || !requiresTarget" ng-click="doAction(p.id)">{{p.name}}</button></li>
+            <li ng-repeat="p in otherPlayers track by $index"><button ng-disabled="p.isTargetDisabled" ng-click="doAction(p.id)">{{p.name}}<span ng-hide="p.isAlive">(dead)</span></button></li>
         </ul>
     </div>
 </div>

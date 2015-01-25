@@ -61,37 +61,51 @@ var Betrayal;
         $scope.startGame = function () {
             gameService.startGame();
         };
-        gameService.setStartGameCallback(function () {
-            gameService.setGameChangedCallback(null);
-            location.hash = "#/playing";
-        });
         gameService.setGameChangedCallback(function () {
-            $scope.players = gameService.game.players;
-            $scope.isDisabled = $scope.players.length < 2;
-            $scope.$digest();
+            if (gameService.hasStarted) {
+                gameService.setGameChangedCallback(null);
+                location.hash = "#/playing";
+            }
+            else {
+                $scope.players = gameService.game.players;
+                $scope.isDisabled = $scope.players.length < 2;
+                $scope.$digest();
+            }
         });
     }]);
     betrayalApp.controller('PlayingCtrl', ['$scope', 'gameService', function ($scope, gameService) {
-        $scope.canAct = true;
         $scope.enableClickOnPlayers = false;
+        $scope.roundTime = gameService.game.timer;
         var updateProperties = function () {
             $scope.role = gameService.player.role;
             $scope.name = gameService.name;
             $scope.action = gameService.game.deckActions[gameService.player.role];
-            $scope.otherPlayers = gameService.otherPlayers;
-            $scope.messages = gameService.messages;
             $scope.requiresTarget = gameService.needsTarget();
+            $scope.canAct = gameService.canAct;
+            $scope.isActionDisabled = $scope.requiresTarget || !$scope.canAct;
+            $scope.isAlive = gameService.player.state === 'active';
+            var otherPlayers = [];
+            for (var i in gameService.otherPlayers) {
+                var player = gameService.otherPlayers[i];
+                otherPlayers.push({ id: player.id, name: player.name, isTargetDisabled: (!$scope.requiresTarget || !$scope.canAct || player.state !== 'active'), isAlive: player.state === 'active' });
+            }
+            $scope.otherPlayers = otherPlayers;
+            $scope.messages = gameService.messages;
         };
         updateProperties();
         $scope.doAction = function (target) {
-            if ($scope.canAct) {
-                $scope.canAct = false;
-                gameService.actOnTarget(target);
-            }
+            gameService.actOnTarget(target);
+            updateProperties();
         };
         gameService.setGameChangedCallback(function () {
-            updateProperties();
-            $scope.$digest();
+            if (!gameService.hasStarted) {
+                gameService.setGameChangedCallback(null);
+                location.hash = "#/lobby";
+            }
+            else {
+                updateProperties();
+                $scope.$digest();
+            }
         });
     }]);
 })(Betrayal || (Betrayal = {}));

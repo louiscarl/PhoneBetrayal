@@ -21,4 +21,9 @@
         game: IGame;
         player: IPlayer;
     }
+
+    interface IMessageData {
+        role: string;
+        message: string;
+    }
 }
