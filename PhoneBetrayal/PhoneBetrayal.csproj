@@ -24,8 +24,11 @@
     <Content Include="img\1509-grunge-metal-textures.jpg" />
     <Content Include="img\noise.png" />
     <Content Include="index.html" />
+    <Content Include="partials\player-playing.html" />
+    <Content Include="partials\player-lobby.html" />
     <Content Include="partials\player-join.html" />
     <Content Include="web.config" />
+    <TypeScriptCompile Include="js\game-service.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-cookies.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-mocks.d.ts" />
@@ -34,6 +37,7 @@
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-sanitize.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\server\betrayal-server.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
