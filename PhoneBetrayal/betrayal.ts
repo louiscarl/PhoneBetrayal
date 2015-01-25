@@ -6,7 +6,7 @@ module Betrayal {
     var socket: SocketIOClient.Socket;
 
     // Socket.io
-    socket = null;//io('http://hidden-citadel-7739.herokuapp.com');
+    socket = io('http://hidden-citadel-7739.herokuapp.com');
     console.log("id", socket);
 
     // Angular
@@ -101,8 +101,12 @@ module Betrayal {
         $scope.enableClickOnPlayers = false;
         $scope.roundTime = gameService.game.timer;
 
+        var getImageUrl = function (role: string) {
+            return 'img/rolePortraits/jpg/' + role.toLowerCase() + '.png';
+        };
         var updateProperties = function () {
             $scope.role = gameService.player.role;
+            $scope.roleUrl = getImageUrl(gameService.player.role);
             $scope.name = gameService.name;
             $scope.action = gameService.game.deckActions[gameService.player.role];
             $scope.requiresTarget = gameService.needsTarget();
