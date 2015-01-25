@@ -34,7 +34,8 @@ io.on('connection', function (socket) {
     socket.on('join', function(cb){
         // This is called manually when the client has loaded
         console.log("Player joined");
-        gameController.join(socket.id, function(err, res){
+        gameController.join(socket.id, function(err, data){
+            res = data.game
             if (err) { socket.emit("alert", err); }
             else{
                 socket.join(res.id);
@@ -49,7 +50,8 @@ io.on('connection', function (socket) {
     // Player calls to start the game
     socket.on('start', function(cb){
         var gameId = gameController.playerToGame(socket.id);
-        gameController.start(gameId, function(err, game){
+        gameController.start(gameId, function(err, data){
+            game = data.game;
             if(!err) {
                 console.log("Starting game", gameId);
                 io.to(gameId).emit('game', game);
@@ -61,14 +63,14 @@ io.on('connection', function (socket) {
 
     socket.on('end', function(cb){
         var gameId = gameController.playerToGame(socket.id);
-        gameController.endRound(gameId, function(err, game){
+        gameController.endRound(gameId, function(err, data){
+            game = data.game;
             if(!err) {
-                console.log("Ending game", gameId);
                 io.to(gameId).emit('game', game);
             }
             return cb(err, game);
         });
-    })
+    });
 
     // User Leaves
     socket.on('disconnect', function(){
@@ -81,24 +83,31 @@ io.on('connection', function (socket) {
 
     // User chooses a name
     socket.on('name', function(data, cb){
-        gameController.setName(socket.id, data.name, cb);
+        gameController.setName(socket.id, data.name, function(err, data){
+            console.log("returned");
+            if(data.game) io.to(data.game.id).emit('game', data.game);
+        });
     });
 
     // User plays their role action
     socket.on('playRole', function(data, cb){
-        gameController.playRole(socket.id, data.target, function(info, game){
-            if(game) io.to(game.id).emit('game', game);
-            cb(info);
-        });
-    });
-
-    // User plays a card
-    socket.on('playCard', function(data, cb){
-        console.log("playCard");
-        gameController.playCard(socket.id, data.card, function(err, game){
-            if(!err) io.to(game.id).emit('game', game);
+        gameController.playRole(socket.id, data.target, function(err, data){
+            if(err) return cb(err);
+            if(data.game) io.to(data.game.id).emit('game', data.game);
+            if(data.role){
+                for (var roleMessage in data.role){
+                    // roleMessage = data.role[x];
+                    io.to(game.id).emit('role', roleMessage);
+                }
+            }
             cb(err);
         });
     });
 
+});
+
+
+gameController.eventEmitter.on('timeout', function(game){
+    console.log("EventEmitter");
+    io.to(game.id).emit('game', game);
 });
