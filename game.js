@@ -1,5 +1,5 @@
-var _ = require('underscore')
-  , fs = require('fs')
+var _ = require('underscore'),
+  fs = require('fs');
 var EventEmitter = require('events').EventEmitter;
 
 exports.eventEmitter = new EventEmitter();
@@ -67,6 +67,7 @@ var newRound = function(game){
     for(var p in game.players){
         var player = game.players[p];
         player.role = deck.pop();
+        player.target = null;
     }
     
     //TODO: Start the timer ticking
@@ -75,7 +76,7 @@ var newRound = function(game){
     var roundEnd = now + roundTimeLimit * 1000;
     game.roundEnd = roundEnd;
 
-    timeouts[game.id] = setTimeout(function(){exports.endRound(game.id, function(err, data){console.log("ended"); exports.eventEmitter.emit('timeout', data.game)});}, roundTimeLimit * 1000);
+    timeouts[game.id] = setTimeout(function(){exports.endRound(game.id, function(err, data){console.log("ended"); exports.eventEmitter.emit('timeout', data.game);});}, roundTimeLimit * 1000);
 
 };
 
@@ -89,22 +90,22 @@ exports.join = function(uuid, cb){
         cb("UUID not found");
         return;
     }
-    var game = _.find(games, function(game){ return game.state == "prep" });
+    var game = _.find(games, function(game){ return game.state == "prep";});
     if(typeof game == "undefined") {
         game = newGame();
         // games.push(game);
     }
-    game.now = new Date().getTime()
-    var player = _.findWhere( game.players, {id: uuid} )
+    game.now = new Date().getTime();
+    var player = _.findWhere( game.players, {id: uuid} );
     if( typeof player === 'undefined'){
-        var player = {
-            id: uuid
-            , name: names.shift() || uuid
-            , role: ""
-            , lives: startLives
-            , state: 'active'
-            , score: 0
-        }
+        player = {
+            id: uuid,
+            name: names.shift() || uuid,
+            role: "",
+            lives: startLives,
+            state: 'active',
+            score: 0
+        };
         playerToGame[player.id] = game.id;
     }
     if(_.where(game.players, {state:'active'}).length >= maxPlayers) player.state = 'spectating';
@@ -169,29 +170,29 @@ exports.leave = function(gameId, uuid, cb){
     // game.players = _.without(game.players, player)
 };
 
-exports.getGame = function(){ return game }
+exports.getGame = function(){ return game; };
 
 exports.getScores = function(){
-    return _.map(game.players, function(val, key){ return { id:val.id, name:val.name, score:val.score }; })
-}
+    return _.map(game.players, function(val, key){ return { id:val.id, name:val.name, score:val.score }; });
+};
 
-exports.getPlayers = function(){ return players }
+exports.getPlayers = function(){ return players; };
 
-exports.getPlayer = function(uuid){ return _.find(players, function(player){ return player.id == uuid })}
+exports.getPlayer = function(uuid){ return _.find(players, function(player){ return player.id == uuid; } );};
 
-exports.getState = function(){ return game.state }
+exports.getState = function(){ return game.state; };
 
-exports.getTitle = function(){ return game.title }
+exports.getTitle = function(){ return game.title; };
 
-exports.getRound = function(){ return game.round }
+exports.getRound = function(){ return game.round; };
 
-exports.getWinner = function(){ return game.winner }
+exports.getWinner = function(){ return game.winner; };
 
 exports.setName = function(id, name, cb){
-    var p = _.find(game.players, function(player){ return player.id == id })
-    if(p) p.name = name
-    cb(null, { players: game.players })
-}
+    var p = _.find(game.players, function(player){ return player.id == id; });
+    if(p) p.name = name;
+    cb(null, { players: game.players });
+};
 
 exports.playRole = function(playerId, target, cb){
     // Play a role to the group
@@ -206,7 +207,7 @@ exports.playRole = function(playerId, target, cb){
     var guardianRole = guardianPlayer.role;
 
     if(player.state != "active") return cb("You cannot play an action now.");
-    if(player.target != null) return cb("You have already played your action");
+    if(player.target !== null) return cb("You have already played your action");
     
     // Get the player's role
     var playerRole = player.role;
@@ -269,7 +270,6 @@ exports.playRole = function(playerId, target, cb){
             break;
         default:
             return cb("You broke the game.");
-            break;
     }
         
 
@@ -277,11 +277,11 @@ exports.playRole = function(playerId, target, cb){
 
 
     cb(null, {game:game, role:roleMessages});
-}
+};
 
 exports.reset = function(cb){
-    init()
+    init();
     cb(null, game);
-}
+};
 
-init()
+init();
