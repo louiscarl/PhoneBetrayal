@@ -13,7 +13,7 @@
     </div>
     <div><h3>Players</h3>
         <ul>
-            <li ng-repeat="p in otherPlayers track by $index"><button ng-disabled="!canAct || !requiresTarget" ng-click="doAction('{{p.id}}')">{{p.name}}</button></li>
+            <li ng-repeat="p in otherPlayers track by $index"><button ng-disabled="!canAct || !requiresTarget" ng-click="doAction(p.id)">{{p.name}}</button></li>
         </ul>
     </div>
 </div>
