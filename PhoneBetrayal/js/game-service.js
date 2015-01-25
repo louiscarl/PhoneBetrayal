@@ -1,7 +1,8 @@
 var Betrayal;
 (function (Betrayal) {
     var GameServiceConstants = {
-        playerNameCookie: "PlayerName"
+        playerNameCookie: "PlayerName",
+        playerIdCookie: "PlayerId"
     };
     var TargetWhenDead = [
         "SNAKE"
@@ -11,6 +12,7 @@ var Betrayal;
         function GameService(socket, cookieStore) {
             this.hasStarted = false;
             this.isConnected = false;
+            this.isJoining = false;
             this.playerId = null;
             this.cookieStore = cookieStore;
             this.messages = [];
@@ -25,6 +27,11 @@ var Betrayal;
             this.socket = socket;
             this.socket.on('game', this.onGameChangedCallback);
             this.socket.on('role', this.onRoleMessageCallback);
+            var previousPlayerId = this.cookieStore.get(GameServiceConstants.playerIdCookie);
+            if (previousPlayerId && (this.name.length >= 2)) {
+                this.isJoining = true;
+                this.socket.emit('join', { uuid: previousPlayerId, name: this.name }, this.onGameJoined.bind(this));
+            }
         };
         GameService.prototype.loadGame = function (gameData) {
             if (this.playerId === null) {
@@ -110,11 +117,13 @@ var Betrayal;
         };
         GameService.prototype.onGameJoined = function (data) {
             // Join the game, get our player id back
+            this.isJoining = false;
             console.log("joined", data);
             if (data.player) {
                 this.playerId = data.player.id;
                 this.isConnected = true;
                 this.socket.emit('name', { "name": this.name });
+                this.cookieStore.put(GameServiceConstants.playerIdCookie, this.playerId);
                 this.loadGame(data.game);
             }
             else {
@@ -126,6 +135,7 @@ var Betrayal;
             // gameService.loadPlayer(data.player);
         };
         GameService.prototype.joinGame = function () {
+            this.isJoining = true;
             this.socket.emit('join', this.onGameJoined.bind(this));
         };
         GameService.prototype.setName = function (name) {

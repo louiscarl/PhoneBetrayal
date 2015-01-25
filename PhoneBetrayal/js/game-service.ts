@@ -1,6 +1,7 @@
 module Betrayal {
     var GameServiceConstants = {
-        playerNameCookie: "PlayerName"
+        playerNameCookie: "PlayerName",
+        playerIdCookie: "PlayerId"
     };
 
     var TargetWhenDead = [
@@ -31,11 +32,14 @@ module Betrayal {
 
         isConnected: boolean;
 
+        isJoining: boolean;
+
         private cookieStore: ng.cookies.ICookieStoreService;
 
         constructor(socket: SocketIOClient.Socket, cookieStore: ng.cookies.ICookieStoreService) {
             this.hasStarted = false;
             this.isConnected = false;
+            this.isJoining = false;
             this.playerId = null;
             this.cookieStore = cookieStore;
             this.messages = [];
@@ -52,6 +56,12 @@ module Betrayal {
             this.socket = socket;
             this.socket.on('game', this.onGameChangedCallback);
             this.socket.on('role', this.onRoleMessageCallback)
+
+            var previousPlayerId = this.cookieStore.get(GameServiceConstants.playerIdCookie);
+            if (previousPlayerId && (this.name.length >= 2)) {
+                this.isJoining = true;
+                this.socket.emit('join', { uuid: previousPlayerId, name: this.name }, this.onGameJoined.bind(this));
+            }
         }
 
         loadGame(gameData: Betrayal.Server.IGame) {
@@ -106,7 +116,6 @@ module Betrayal {
             console.log("endRound");
             this.socket.emit('end', function (err, game: Betrayal.Server.IGame) {
                 console.log(err, game);
-
             });
         }
 
@@ -161,11 +170,13 @@ module Betrayal {
 
         private onGameJoined(data: Betrayal.Server.IJoinResponseData) {
             // Join the game, get our player id back
+            this.isJoining = false;
             console.log("joined", data);
             if (data.player) {
                 this.playerId = data.player.id;
                 this.isConnected = true;
                 this.socket.emit('name', { "name": this.name });
+                this.cookieStore.put(GameServiceConstants.playerIdCookie, this.playerId);
                 this.loadGame(data.game);
             } else {
                 // let the UI know we failed to connect
@@ -177,6 +188,7 @@ module Betrayal {
         }
 
         joinGame() {
+            this.isJoining = true;
             this.socket.emit('join', this.onGameJoined.bind(this));
         }
 

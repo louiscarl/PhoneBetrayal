@@ -38,22 +38,22 @@ var Betrayal;
             }
             return;
         }
-        $scope.joinAttempted = false;
+        $scope.joinAttempted = gameService.isJoining;
         $scope.playerName = gameService.name;
         $scope.hasError = false;
         $scope.isDisabled = false;
         $scope.joinGame = function () {
-            if (!$scope.joinAttempted && ($scope.playerName.length >= 2)) {
-                $scope.joinAttempted = true;
+            if (!gameService.isJoining && ($scope.playerName.length >= 2)) {
                 $scope.isDisabled = true;
                 $scope.hasError = false;
                 gameService.setName($scope.playerName);
                 gameService.joinGame();
+                $scope.joinAttempted = gameService.isJoining;
             }
         };
         gameService.setGameChangedCallback(function () {
-            if ($scope.joinAttempted) {
-                $scope.joinAttempted = false;
+            if (gameService.isJoining !== $scope.joinAttempted) {
+                $scope.joinAttempted = gameService.isJoining;
                 if (gameService.isConnected) {
                     gameService.setGameChangedCallback(null);
                     location.hash = "#/lobby/" + gameService.game.id;
