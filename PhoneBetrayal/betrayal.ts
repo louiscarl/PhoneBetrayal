@@ -1,10 +1,12 @@
 /// <reference path="js/game-service.ts" />
 module Betrayal {
-    declare var io;
-    declare var angular;
+    declare var io: SocketIOClientStatic;
+    declare var angular: ng.IAngularStatic;
+
+    var socket: SocketIOClient.Socket;
 
     // Socket.io
-    var socket = io('http://hidden-citadel-7739.herokuapp.com').connect();
+    socket = io('http://hidden-citadel-7739.herokuapp.com');
     console.log("id", socket);
 
     // Angular
@@ -13,7 +15,7 @@ module Betrayal {
     ]);
 
     betrayalApp.config(['$routeProvider',
-        function ($routeProvider) {
+        function ($routeProvider : ng.route.IRouteProvider) {
             $routeProvider.
                 when('/lobby', {
                     templateUrl: 'partials/player-lobby.html',
@@ -35,7 +37,7 @@ module Betrayal {
     betrayalApp.factory('gameService', [function () {
         var gameService = new Betrayal.GameService(socket);
 
-        socket.emit('join', function (data) {
+        socket.emit('join', function (data : Betrayal.Server.IJoinResponseData) {
             // Join the game, get our player id back
             console.log("joined", data);
             gameService.playerId = data.player.id;
@@ -43,7 +45,7 @@ module Betrayal {
             // gameService.loadPlayer(data.player);
         });
 
-        socket.on('game', function (gameData) {
+        socket.on('game', function (gameData : Betrayal.Server.IGame) {
             console.log("gameData received");
             gameService.loadGame(gameData);
         });

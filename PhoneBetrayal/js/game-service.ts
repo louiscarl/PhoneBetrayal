@@ -9,13 +9,13 @@ module Betrayal {
 
         otherPlayers: Array<Betrayal.Server.IPlayer>;
 
-        socket: any;
+        socket: SocketIOClient.Socket;
 
         private startGameCallback: Function;
 
         private hasStarted: boolean;
 
-        constructor(socket: any) {
+        constructor(socket: SocketIOClient.Socket) {
             this.hasStarted = false;
             this.playerId = null;
             this.socket = socket;

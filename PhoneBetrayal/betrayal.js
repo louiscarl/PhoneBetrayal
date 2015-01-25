@@ -1,8 +1,9 @@
 /// <reference path="js/game-service.ts" />
 var Betrayal;
 (function (Betrayal) {
+    var socket;
     // Socket.io
-    var socket = io('http://hidden-citadel-7739.herokuapp.com').connect();
+    socket = io('http://hidden-citadel-7739.herokuapp.com');
     console.log("id", socket);
     // Angular
     var betrayalApp = angular.module('betrayalApp', [
