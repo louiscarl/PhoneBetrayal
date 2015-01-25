@@ -13,7 +13,6 @@ var playerToGame = {};
 // Betrayal Settings
 var maxPlayers = 12;
 var roundTimeLimit = 10;
-var startLives = 5;
 
 var deckActions = {
     "ROBOT": "SUBTRACT 15 SECONDS FROM THE TIMER",
@@ -102,7 +101,6 @@ exports.join = function(uuid, cb){
             id: uuid,
             name: names.shift() || uuid,
             role: "",
-            lives: startLives,
             state: 'active',
             score: 0
         };

@@ -9,7 +9,7 @@ block content
           .panel.panel-default
             .panel-heading
                 | {{p.name}}
-                span.glyphicon.glyphicon-heart(ng-repeat='a in range(p.lives) track by $index')
+                span.glyphicon.glyphicon-heart(ng-repeat='a in range(p.score) track by $index')
               .panel-body
                 .row
                   span(ng-if='game.state == "ended"') {{p.role}}
@@ -28,8 +28,8 @@ block content
             .panel.panel-default(ng-class="{ 'panel-success': game.players[game.turn] == player } ")
               .panel-heading
                 | {{player.name}} - {{player.role}}
-                | Lives:
-                span.glyphicon.glyphicon-heart(ng-repeat='a in range(player.lives) track by $index')
+                | Score:
+                span.glyphicon.glyphicon-heart(ng-repeat='a in range(player.score) track by $index')
               .panel-body
                 a.col-md-2(href='#', ng-click='playRole($index)', ng-repeat='p in game.players track by $index')
                   span(ng-click='setName(prompt("Enter a name:"))') {{p.name}}
