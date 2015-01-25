@@ -3,20 +3,25 @@ module Betrayal {
     export class GameService {
         playerId: string;
 
-        game: any;
+        game: Betrayal.Server.IGame;
 
-        player: any;
+        player: Betrayal.Server.IPlayer;
 
-        otherPlayers: Array<any>;
+        otherPlayers: Array<Betrayal.Server.IPlayer>;
 
         socket: any;
 
+        private startGameCallback: Function;
+
+        private hasStarted: boolean;
+
         constructor(socket: any) {
+            this.hasStarted = false;
             this.playerId = null;
             this.socket = socket;
         }
 
-        loadGame(gameData: any) {
+        loadGame(gameData: Betrayal.Server.IGame) {
             this.game = gameData;
             console.log("Game is now", this.game);
             for (var x in this.game.players) {
@@ -29,10 +34,18 @@ module Betrayal {
                 }
             }
 
+            if (!this.hasStarted && (this.game.state == "active")) {
+                this.hasStarted = true;
+                this.startGameCallback();
+                this.startGameCallback = null;
+            } else if (this.hasStarted && (this.game.state == "ended")) {
+                this.hasStarted = false;
+            }
+
             // this.$digest();
         }
 
-        loadPlayer(playerData: any) {
+        loadPlayer(playerData: Betrayal.Server.IPlayer) {
             this.player = playerData;
             console.log("Player is now", this.player);
             //gameService.$digest();
@@ -40,15 +53,14 @@ module Betrayal {
     
         startGame() {
             console.log("startGame");
-            this.socket.emit('start', function (err, game) {
+            this.socket.emit('start', function (err, game: Betrayal.Server.IGame) {
                 console.log(err, game);
-
             });
         }
 
         endRound() {
             console.log("endRound");
-            this.socket.emit('end', function (err, game) {
+            this.socket.emit('end', function (err, game: Betrayal.Server.IGame) {
                 console.log(err, game);
 
             });
@@ -66,6 +78,10 @@ module Betrayal {
 
         setName(name : string) {
             this.socket.emit('name', { "name": name });
+        }
+
+        setStartGameCallback(callback: Function) {
+            this.startGameCallback = callback;
         }
     }     
 }

@@ -3,6 +3,7 @@ var Betrayal;
     // GameService class
     var GameService = (function () {
         function GameService(socket) {
+            this.hasStarted = false;
             this.playerId = null;
             this.socket = socket;
         }
@@ -17,6 +18,14 @@ var Betrayal;
                     this.otherPlayers = this.game.players.slice(x + 1).concat(this.game.players.slice(0, x));
                     break;
                 }
+            }
+            if (!this.hasStarted && (this.game.state == "active")) {
+                this.hasStarted = true;
+                this.startGameCallback();
+                this.startGameCallback = null;
+            }
+            else if (this.hasStarted && (this.game.state == "ended")) {
+                this.hasStarted = false;
             }
             // this.$digest();
         };
@@ -48,6 +57,9 @@ var Betrayal;
         };
         GameService.prototype.setName = function (name) {
             this.socket.emit('name', { "name": name });
+        };
+        GameService.prototype.setStartGameCallback = function (callback) {
+            this.startGameCallback = callback;
         };
         return GameService;
     })();

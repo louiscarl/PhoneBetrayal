@@ -59,6 +59,17 @@ module Betrayal {
     }]);
 
     betrayalApp.controller('LobbyCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
+        $scope.getPlayers = function () {
+            return gameService.game.players;
+        };
+
+        $scope.startGame = function () {
+            gameService.startGame();
+        };
+
+        gameService.setStartGameCallback(function () {
+            location.hash = "#/playing";
+        });
     }]);
 
     betrayalApp.controller('PlayingCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
