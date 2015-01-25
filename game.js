@@ -67,6 +67,7 @@ var newRound = function(game){
         var player = game.players[p];
         player.role = deck.pop();
         player.target = null;
+        if(player.state == 'dead') player.state = 'active';
     }
     
     //TODO: Start the timer ticking
@@ -142,7 +143,18 @@ exports.endRound = function(gameId, cb){
     game.state = 'ended';
 
     //TODO: Resolve the winner
-
+    for(var p in game.players){
+        var player = game.players[p];
+        if(player.state == 'active') player.score++;
+        // else if(['ROBOT', 'SYMPATHIZER', 'SNAKE'].contains(player.role))
+        //     player.score++;
+        if(player.role == 'MECHANIC' && player.state == 'active' && player.target){
+            targetPlayer = _.findWhere(game.players, {id:player.target});
+            targetPlayer.score++;
+        }
+        if(player.role == 'SNAKE' && player.target) player.score++;
+        if(player.role == 'GUARDIAN' && player.target == -1) player.score++;
+    }
 
     cb(null, {game:game});
 };
