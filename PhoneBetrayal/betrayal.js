@@ -7,6 +7,7 @@ var Betrayal;
     console.log("id", socket);
     // Angular
     var betrayalApp = angular.module('betrayalApp', [
+        'ngCookies',
         'ngRoute'
     ]);
     betrayalApp.config(['$routeProvider', function ($routeProvider) {
@@ -23,8 +24,8 @@ var Betrayal;
             redirectTo: '/join'
         });
     }]);
-    betrayalApp.factory('gameService', [function () {
-        var gameService = new Betrayal.GameService(socket);
+    betrayalApp.factory('gameService', ['$cookieStore', function ($cookieStore) {
+        var gameService = new Betrayal.GameService(socket, $cookieStore);
         socket.emit('join', function (data) {
             // Join the game, get our player id back
             console.log("joined", data);
@@ -39,9 +40,12 @@ var Betrayal;
         return gameService;
     }]);
     betrayalApp.controller('JoinCtrl', ['$scope', 'gameService', function ($scope, gameService) {
-        $scope.join = function (user) {
-            gameService.setName(user.name);
-            location.hash = "#/lobby";
+        $scope.playerName = gameService.name;
+        $scope.joinGame = function () {
+            if ($scope.playerName.length >= 2) {
+                gameService.setName($scope.playerName);
+                location.hash = "#/lobby";
+            }
         };
     }]);
     betrayalApp.controller('LobbyCtrl', ['$scope', 'gameService', function ($scope, gameService) {

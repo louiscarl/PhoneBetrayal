@@ -1,7 +1,13 @@
 module Betrayal {
+    var GameServiceConstants = {
+        playerNameCookie: "PlayerName"
+    };
+
     // GameService class
     export class GameService {
         playerId: string;
+
+        name: string;
 
         game: Betrayal.Server.IGame;
 
@@ -15,10 +21,14 @@ module Betrayal {
 
         private hasStarted: boolean;
 
-        constructor(socket: SocketIOClient.Socket) {
+        private cookieStore: ng.cookies.ICookieStoreService;
+
+        constructor(socket: SocketIOClient.Socket, cookieStore: ng.cookies.ICookieStoreService) {
             this.hasStarted = false;
             this.playerId = null;
+            this.cookieStore = cookieStore;
             this.socket = socket;
+            this.name = cookieStore.get(GameServiceConstants.playerNameCookie) || "";
         }
 
         loadGame(gameData: Betrayal.Server.IGame) {
@@ -78,6 +88,10 @@ module Betrayal {
 
         setName(name : string) {
             this.socket.emit('name', { "name": name });
+            if (this.name !== name) {
+                this.name = name;
+                this.cookieStore.put(GameServiceConstants.playerNameCookie, name);
+            }                
         }
 
         setStartGameCallback(callback: Function) {

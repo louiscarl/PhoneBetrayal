@@ -11,6 +11,7 @@ module Betrayal {
 
     // Angular
     var betrayalApp = angular.module('betrayalApp', [
+        'ngCookies',
         'ngRoute'
     ]);
 
@@ -34,8 +35,8 @@ module Betrayal {
                 });
         }]);
 
-    betrayalApp.factory('gameService', [function () {
-        var gameService = new Betrayal.GameService(socket);
+    betrayalApp.factory('gameService', ['$cookieStore', function ($cookieStore: ng.cookies.ICookieStoreService) {
+        var gameService = new Betrayal.GameService(socket, $cookieStore);
 
         socket.emit('join', function (data : Betrayal.Server.IJoinResponseData) {
             // Join the game, get our player id back
@@ -54,9 +55,13 @@ module Betrayal {
     }]);
 
     betrayalApp.controller('JoinCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
-        $scope.join = function (user) {
-            gameService.setName(user.name);
-            location.hash = "#/lobby";
+        $scope.playerName = gameService.name;
+
+        $scope.joinGame = function () {
+            if ($scope.playerName.length >= 2) {
+                gameService.setName($scope.playerName);
+                location.hash = "#/lobby";
+            }
         };
     }]);
 

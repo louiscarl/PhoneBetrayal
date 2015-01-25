@@ -1,11 +1,16 @@
 var Betrayal;
 (function (Betrayal) {
+    var GameServiceConstants = {
+        playerNameCookie: "PlayerName"
+    };
     // GameService class
     var GameService = (function () {
-        function GameService(socket) {
+        function GameService(socket, cookieStore) {
             this.hasStarted = false;
             this.playerId = null;
+            this.cookieStore = cookieStore;
             this.socket = socket;
+            this.name = cookieStore.get(GameServiceConstants.playerNameCookie) || "";
         }
         GameService.prototype.loadGame = function (gameData) {
             this.game = gameData;
@@ -57,6 +62,10 @@ var Betrayal;
         };
         GameService.prototype.setName = function (name) {
             this.socket.emit('name', { "name": name });
+            if (this.name !== name) {
+                this.name = name;
+                this.cookieStore.put(GameServiceConstants.playerNameCookie, name);
+            }
         };
         GameService.prototype.setStartGameCallback = function (callback) {
             this.startGameCallback = callback;
