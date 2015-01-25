@@ -38,19 +38,19 @@ module Betrayal {
     betrayalApp.factory('gameService', ['$cookieStore', function ($cookieStore: ng.cookies.ICookieStoreService) {
         var gameService = new Betrayal.GameService(socket, $cookieStore);
 
-        socket.on('game', function (gameData : Betrayal.Server.IGame) {
-            console.log("gameData received");
-            gameService.loadGame(gameData);
-        });
-
-        socket.on('role', function (data: Betrayal.Server.IMessageData) {
-            gameService.onMessage(data);
-        })
-
         return gameService;
     }]);
 
     betrayalApp.controller('JoinCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
+        if (gameService.isConnected) {
+            if (gameService.hasStarted) {
+                location.hash = "#/playing/" + gameService.game.id;
+            } else {
+                location.hash = "#/lobby/" + gameService.game.id;
+            }
+            return;
+        }
+
         $scope.joinAttempted = false;
 
         $scope.playerName = gameService.name;
@@ -84,7 +84,20 @@ module Betrayal {
         });
     }]);
 
-    betrayalApp.controller('LobbyCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
+    betrayalApp.controller('LobbyCtrl', ['$scope', '$routeParams', 'gameService', function ($scope, $routeParams, gameService: GameService) {
+        if (!gameService.isConnected) {
+            location.hash = "#/join";
+            return;
+        }
+        else if (gameService.hasStarted) {
+            location.hash = "#/playing/" + gameService.game.id;
+            return;
+        }
+        else if ($routeParams.lobbyid != gameService.game.id) {
+            location.hash = "#/lobby/" + gameService.game.id;
+            return;
+        }
+
         $scope.players = gameService.game.players;
 
         $scope.isDisabled = $scope.players.length < 2;
@@ -105,7 +118,19 @@ module Betrayal {
         });
     }]);
 
-    betrayalApp.controller('PlayingCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
+    betrayalApp.controller('PlayingCtrl', ['$scope', '$routeParams', 'gameService', function ($scope, $routeParams, gameService: GameService) {
+        if (!gameService.isConnected) {
+            location.hash = "#/join";
+            return;
+        }
+        else if (!gameService.hasStarted) {
+            location.hash = "#/lobby/" + gameService.game.id;
+            return;
+        }
+        else if ($routeParams.lobbyid != gameService.game.id) {
+            location.hash = "#/playing/" + gameService.game.id;
+            return;
+        }
 
         var updateProperties = function () {
             $scope.role = gameService.player.role;

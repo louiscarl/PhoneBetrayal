@@ -13,11 +13,19 @@ var Betrayal;
             this.isConnected = false;
             this.playerId = null;
             this.cookieStore = cookieStore;
-            this.socket = socket;
             this.messages = [];
+            this.socket = null;
             this.name = cookieStore.get(GameServiceConstants.playerNameCookie) || "";
             this.onActionErrorCallback = this.onActionError.bind(this);
+            this.onGameChangedCallback = this.loadGame.bind(this);
+            this.onRoleMessageCallback = this.onMessage.bind(this);
+            this.connect(socket);
         }
+        GameService.prototype.connect = function (socket) {
+            this.socket = socket;
+            this.socket.on('game', this.onGameChangedCallback);
+            this.socket.on('role', this.onRoleMessageCallback);
+        };
         GameService.prototype.loadGame = function (gameData) {
             if (this.playerId === null) {
                 // ignore until we've joined

@@ -38,10 +38,20 @@ module Betrayal {
             this.isConnected = false;
             this.playerId = null;
             this.cookieStore = cookieStore;
-            this.socket = socket;
             this.messages = [];
+            this.socket = null;
             this.name = cookieStore.get(GameServiceConstants.playerNameCookie) || "";
             this.onActionErrorCallback = this.onActionError.bind(this);
+            this.onGameChangedCallback = this.loadGame.bind(this);
+            this.onRoleMessageCallback = this.onMessage.bind(this);
+
+            this.connect(socket);
+        }
+
+        connect(socket: SocketIOClient.Socket) {
+            this.socket = socket;
+            this.socket.on('game', this.onGameChangedCallback);
+            this.socket.on('role', this.onRoleMessageCallback)
         }
 
         loadGame(gameData: Betrayal.Server.IGame) {
@@ -106,6 +116,10 @@ module Betrayal {
         }
 
         private onActionErrorCallback: Function;
+
+        private onGameChangedCallback: Function;
+
+        private onRoleMessageCallback: Function;
         
         onActionError(err: string) {
             if (err) {
