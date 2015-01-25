@@ -32,7 +32,7 @@ block content
                 span.glyphicon.glyphicon-heart(ng-repeat='a in range(player.lives) track by $index')
               .panel-body
                 a.col-md-2(href='#', ng-click='playRole($index)', ng-repeat='p in game.players track by $index')
-                  span {{p.name}}
+                  span(ng-click='setName(prompt("Enter a name:"))') {{p.name}}
           .col-md-2
             a.btn.btn-primary.btn-block(ng-if='game.state == "prep"', href='', ng-click='startGame()') Start
             a.btn.btn-primary.btn-block(ng-if='game.state == "active"', href='', ng-click='endRound()') End

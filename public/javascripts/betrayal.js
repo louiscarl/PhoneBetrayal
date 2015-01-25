@@ -59,6 +59,10 @@ angular.module('betrayalApp', [])
             });
             
         };
+
+        $scope.setName = function(name){
+            socket.emit('name', {"name":name});
+        }
     
         socket.emit('join', function(data){
             // Join the game, get our player id back

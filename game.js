@@ -11,8 +11,18 @@ var playerToGame = {};
 
 // Betrayal Settings
 var maxPlayers = 12;
-var roundTimeLimit = 120;
+var roundTimeLimit = 100;
 var startLives = 5;
+
+var deckActions = {
+    "ROBOT": "SUBTRACT 15 SECONDS FROM THE TIMER",
+    "SYMPATHIZER": "BLOW UP NON-ROBOT PLAYER",
+    "CHILD": "HUG A PLAYER TO CHECK FOR SQUISHY INSIDES",
+    "REBEL": "KILL SOMEONE AND GET AWAY WITH IT",
+    "SNAKE": "BITE A HUMAN WHO INTERACTED WITH YOU",
+    "TWIN":"FIND YOUR TWIN",
+    "MECHANIC":"DISABLE THE ROBOT"
+};
 
 var newDeck = function(possibles){
     // Make a deck of possible roles
@@ -20,7 +30,7 @@ var newDeck = function(possibles){
     //TODO: For each class in the possible array, add the correct number of cards
 
     deck = [
-        'WEREWOLF', 'VILLAGER', 'DETECTIVE', 'HACKER', 'PIRATE', 'ORACLE', 'PRESIDENT'
+        'ROBOT', 'SYMPATHIZER', 'CHILD', 'REBEL', 'SNAKE', 'TWIN', 'TWIN', 'MECHANIC'
     ];
     //TODO: Cut it to players + 1
 
@@ -39,7 +49,8 @@ var newGame = function(cb){
         id:games.length,
         timer:roundTimeLimit,
         players:[],
-        state:"prep"
+        state:"prep",
+        deckActions:deckActions
     };
     games.push(game);
     return game;
@@ -53,6 +64,7 @@ var newRound = function(game){
         player.role = deck.pop();
     }
     game.timer = roundTimeLimit;
+    game.currentTimeout = setTimeout(endRound(), roundTimeLimit * 1000);
     //TODO: Start the timer ticking
 };
 
@@ -105,11 +117,19 @@ exports.start = function(gameId, cb){
     cb(null, game);
 };
 
-exports.end = function(gameId, cb){
+exports.endRound = function(gameId, cb){
+    if(game.currentTimeout) {
+        clearTimeout(); // Just in case
+        game.currentTimeout = null;
+    }
     var game = games[gameId];
     if(!game) return cb("game not found", null);
     
     game.state = 'ended';
+
+    // Resolve the votes
+
+
     cb(null, game);
 };
 
@@ -149,17 +169,7 @@ exports.getTitle = function(){ return game.title }
 
 exports.getRound = function(){ return game.round }
 
-
 exports.getWinner = function(){ return game.winner }
-
-exports.getScoreboard = function(){
-    return {
-        title: game.title
-        , scores: _.map(game.players, function(val, key){ return { id:val.id, name:val.name, score:val.score }; })
-        , players: game.players.length
-    }
-
-}
 
 exports.setName = function(id, name, cb){
     var p = _.find(game.players, function(player){ return player.id == id })
@@ -172,6 +182,47 @@ exports.playRole = function(playerId, target, cb){
     var gameId = playerToGame[playerId];
     var game = games[gameId];
     var player = _.findWhere( game.players, {id: playerId} ); // game.players[id];
+    var targetPlayer = _.findWhere( game.players, {id: target} );
+
+    if(player.state != "active") return cb("You cannot play an action now.");
+    if(player.target != null) return cb("You have already played your action");
+    
+    // Get the player's role
+    var playerRole = player.role
+    switch(playerRole){
+        // 'ROBOT', 'SYMPATHIZER', 'CHILD', 'REBEL', 'SNAKE', 'TWIN', 'TWIN', 'MECHANIC'
+        case "ROBOT":
+            break;
+        case "SYMPATHIZER":
+            if(targetPlayer.role == "ROBOT") return cb("Cannot blow up the robot");
+            targetPlayer.state = 'dead';
+            break;
+        case "CHILD":
+            if(targetPlayer.state == "ROBOT")
+                return cb("YOU HUGGED A ROBOT", game);
+            break;
+        case "REBEL":
+            if( target.state == "active" ){
+                target.state = "dead";
+            }
+            break;
+        case "SNAKE":
+            if(target.target != player.id) return cb ("You cannot attack this player");
+            target.state = "dead";
+            break;
+        case "TWIN":
+            if(target.state == "TWIN") return cb("You have found your twin!");
+            break;
+        case "MECHANIC":
+            if(target.role == "ROBOT") return cb("You have found the robot");
+            break;
+        default:
+            break;
+
+    }
+        
+
+    // Do the role
 
 
     cb(null, game);
