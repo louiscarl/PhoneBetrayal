@@ -76,7 +76,6 @@ var newGame = function(cb){
 };
 
 var newRound = function(game){
-    console.log("newRound");
     // Give everyone a role
     var deck = newDeck();
     for(var p in game.players){
@@ -95,12 +94,11 @@ var newRound = function(game){
     var roundEnd = now + roundTimeLimit * 1000;
     game.roundEnd = roundEnd;
 
-    timeouts[game.id] = setTimeout(function(){exports.endRound(game.id, function(err, data){console.log("ended"); exports.eventEmitter.emit('timeout', data.game);});}, roundTimeLimit * 1000);
+    timeouts[game.id] = setTimeout(function(){exports.endRound(game.id, function(err, data){exports.eventEmitter.emit('timeout', data.game);});}, roundTimeLimit * 1000);
 
 };
 
 exports.playerToGame = function(playerId, cb){
-    console.log("playerToGame", playerId, playerToGame[playerId]);
     return playerToGame[playerId];
 };
 
@@ -135,7 +133,6 @@ exports.join = function(uuid, cb){
 };
 
 exports.start = function(gameId, cb){
-    console.log("gameController.start");
     var game = games[gameId];
     
     if(!game) return cb("game not found", null);
@@ -150,7 +147,6 @@ exports.start = function(gameId, cb){
 };
 
 exports.endRound = function(gameId, cb){
-    console.log("End Round");
     if(timeouts[gameId]) {
         clearTimeout(timeouts[gameId]); // Just in case
         timeouts[gameId] = null;
@@ -244,7 +240,7 @@ exports.playRole = function(playerId, target, cb){
     var targetPlayer = _.findWhere( game.players, {id: target} );
     var guardianPlayer = _.findWhere(game.players, {role: "GUARDIAN"});
     
-    if(player.state != "active") return cb("You cannot play an action now.");
+    if(player.state != "active" && player.role != 'SNAKE') return cb("You cannot play an action now.");
     if(player.target !== null) return cb("You have already played your action");
     if(!targetPlayer) return cb("You must choose a target");
 
@@ -347,11 +343,13 @@ exports.playRole = function(playerId, target, cb){
             break;
         case "MECHANIC":
             player.target = target;
-            if(robots.indexOf(targetPlayer.role) != -1 && targetPlayer.status == 'active'){
+            if(robots.indexOf(targetPlayer.role) != -1 && targetPlayer.state == 'active'){
                 player.success = true;
                 target.success = true;
-                roleMessages.push({role: player.role, message: "You found and saved the " + targetPlayer.role});
-                roleMessages.push({role: targetPlayer.role, message: "You have been saved by the " + player.role + "!"});
+                roleMessages.push({role: player.role, message: "You succeeded by tinkering with the " + targetPlayer.role});
+                roleMessages.push({role: targetPlayer.role, message: "You have been tinkered by the " + player.role + "!"});
+            } else {
+                roleMessages.push({role: player.role, message: "You failed because you targetted the " + targetPlayer.role});
             }
             break;
         case "GUARDIAN":
@@ -364,10 +362,22 @@ exports.playRole = function(playerId, target, cb){
     }
         
 
-    // Do the role
-
-
     cb(null, {game:game, role:roleMessages});
+    // Find out if we should end
+    if(shouldEndRound(game)){
+        exports.eventEmitter.emit('timeout', game);
+    }
+};
+
+var shouldEndRound = function(game){
+    for(var p in game.players){
+        var player = game.players[p];
+        if(player.role == 'SNAKE' && player.target === null) continue;
+        if(player.state == 'active' && player.target === null) return false;
+        else if (player.role == 'SNAKE' && player.target === null) return false;
+    }
+    
+    return true;
 };
 
 var guardianSave = function(player, targetPlayer, guardianPlayer){

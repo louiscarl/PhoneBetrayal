@@ -33,13 +33,11 @@ io.on('connection', function (socket) {
     // User Joins
     socket.on('join', function(cb){
         // This is called manually when the client has loaded
-        console.log("Player joined");
         gameController.join(socket.id, function(err, data){
             res = data.game
             if (err) { socket.emit("alert", err); }
             else{
                 socket.join(res.id);
-                console.log("emitting to", res.id);
                 io.to(res.id).emit('game', res );
             }
           cb({game: res, player: gameController.getPlayer(uuid) });
@@ -53,7 +51,6 @@ io.on('connection', function (socket) {
         gameController.start(gameId, function(err, data){
             game = data.game;
             if(!err) {
-                console.log("Starting game", gameId);
                 io.to(gameId).emit('game', game);
             }
             return cb(err, game);
@@ -110,6 +107,5 @@ io.on('connection', function (socket) {
 
 
 gameController.eventEmitter.on('timeout', function(game){
-    console.log("EventEmitter");
     io.to(game.id).emit('game', game);
 });
