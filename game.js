@@ -201,7 +201,6 @@ exports.getWinner = function(){ return game.winner; };
 exports.setName = function(playerId, name, cb){
     var gameId = playerToGame[playerId];
     var game = games[gameId];
-    console.log(game);
     if( !game ) return cb("game not found");
     var p = _.find(game.players, function(player){ return player.id == playerId; });
     if(p) p.name = name;
@@ -249,7 +248,7 @@ exports.playRole = function(playerId, target, cb){
             break;
         case "REBEL":
             if( targetPlayer.state != "active") return cb("You cannot attack this player");
-            if( guardianPlayer.target == target){
+            if( guardianPlayer && guardianPlayer.target == target){
                 // Reverse them
                 player.state = "dead";
                 guardianPlayer.target = -1; // The only can help once
@@ -263,7 +262,7 @@ exports.playRole = function(playerId, target, cb){
             break;
         case "SNAKE":
             if(targetPlayer.target != player.id) return cb ("You cannot attack this player");
-            if( guardianPlayer.target == target){
+            if( guardianPlayer && guardianPlayer.target == target){
                 // Reverse them
                 player.state = "dead";
                 guardianPlayer.target = -1; // The only can help once
