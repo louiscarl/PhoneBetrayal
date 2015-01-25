@@ -15,7 +15,7 @@
         timer: number;
         players: Array<IPlayer>;
         state: string;
-        deskActions: Map<string, string>;
+        deckActions: Map<string, string>;
     }
 
     interface IJoinResponseData {

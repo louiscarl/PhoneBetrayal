@@ -1,7 +1,11 @@
 ﻿<div ng-controller="PlayingCtrl">
     <div>Time</div>
-    <div>News</div>
-    <div>Role</div>
-    <div>Action</div>
-    <div>Players</div>
+    <div>News goes here</div>
+    <div>Role: {{role}}</div>
+    <div>Action: <button ng-disabled="!canAct" ng-click="doAction()">{{action}}</button></div>
+    <div><div>Players</div>
+        <ul>
+            <li ng-repeat="p in otherPlayers track by $index">{{ p.name }}</li>
+        </ul>
+    </div>
 </div>

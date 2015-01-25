@@ -65,6 +65,7 @@ module Betrayal {
         gameService.setGameChangedCallback(function () {
             if ($scope.joinAttempted) {
                 $scope.joinAttempted = false;
+                gameService.setGameChangedCallback(null);
                 location.hash = "#/lobby";
             }
         });
@@ -80,15 +81,39 @@ module Betrayal {
         };
 
         gameService.setStartGameCallback(function () {
+            gameService.setGameChangedCallback(null);
             location.hash = "#/playing";
         });
 
         gameService.setGameChangedCallback(function () {
+            $scope.players = gameService.game.players;
             $scope.isDisabled = $scope.players.length < 2;
             $scope.$digest();
         });
     }]);
 
     betrayalApp.controller('PlayingCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
+
+        $scope.canAct = true;
+
+        var updateProperties = function () {
+            $scope.role = gameService.player.role;
+            $scope.name = gameService.name;
+            $scope.action = gameService.game.deckActions[gameService.player.role];
+            $scope.otherPlayers = gameService.otherPlayers;
+        };
+        updateProperties();
+
+        $scope.doAction = function () {
+            if ($scope.canAct) {
+                $scope.canAct = false;
+                gameService.playCard(0);
+            }
+        };
+
+        gameService.setGameChangedCallback(function () {
+            updateProperties();
+            $scope.$digest();
+        });
     }]);
 }
