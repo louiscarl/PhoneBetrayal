@@ -198,10 +198,14 @@ exports.getRound = function(){ return game.round; };
 
 exports.getWinner = function(){ return game.winner; };
 
-exports.setName = function(id, name, cb){
-    var p = _.find(game.players, function(player){ return player.id == id; });
+exports.setName = function(playerId, name, cb){
+    var gameId = playerToGame[playerId];
+    var game = games[gameId];
+    console.log(game);
+    if( !game ) return cb("game not found");
+    var p = _.find(game.players, function(player){ return player.id == playerId; });
     if(p) p.name = name;
-    cb(null, { players: game.players });
+    cb(null, { game:game });
 };
 
 exports.playRole = function(playerId, target, cb){
@@ -211,11 +215,13 @@ exports.playRole = function(playerId, target, cb){
     if(!game) return cb("game not found", null);
     game.now = new Date().getTime();
 
+    if(game.state != 'active') cb("Game has not started");
+
     var player = _.findWhere( game.players, {id: playerId} ); // game.players[id];
     var targetPlayer = _.findWhere( game.players, {id: target} );
     var guardianPlayer = _.findWhere(game.players, {role: "GUARDIAN"});
-    var guardianRole = guardianPlayer.role;
-
+    var guardianRole = (guardianPlayer) ? guardianPlayer.role : null;
+    
     if(player.state != "active") return cb("You cannot play an action now.");
     if(player.target !== null) return cb("You have already played your action");
     

@@ -70,7 +70,7 @@ io.on('connection', function (socket) {
             }
             return cb(err, game);
         });
-    })
+    });
 
     // User Leaves
     socket.on('disconnect', function(){
@@ -83,28 +83,23 @@ io.on('connection', function (socket) {
 
     // User chooses a name
     socket.on('name', function(data, cb){
-        gameController.setName(socket.id, data.name, cb);
+        gameController.setName(socket.id, data.name, function(err, data){
+            console.log("returned");
+            if(data.game) io.to(data.game.id).emit('game', data.game);
+        });
     });
 
     // User plays their role action
     socket.on('playRole', function(data, cb){
-        gameController.playRole(socket.id, data.target, function(info, data){
-            if(data.game) io.to(game.id).emit('game', data.game);
+        gameController.playRole(socket.id, data.target, function(err, data){
+            if(err) return cb(err);
+            if(data.game) io.to(data.game.id).emit('game', data.game);
             if(data.role){
                 for (var roleMessage in data.role){
                     // roleMessage = data.role[x];
                     io.to(game.id).emit('role', roleMessage);
                 }
             }
-            cb(info);
-        });
-    });
-
-    // User plays a card
-    socket.on('playCard', function(data, cb){
-        console.log("playCard");
-        gameController.playCard(socket.id, data.card, function(err, game){
-            if(!err) io.to(game.id).emit('game', game);
             cb(err);
         });
     });
