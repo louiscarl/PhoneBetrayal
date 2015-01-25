@@ -1,0 +1,40 @@
+﻿@metalic-color: #222;
+@screen-background: #250;
+@screen-foreground: @screen-background + #220;
+
+body {
+    font-family: Consolas, sans-serif;
+    background-color: @metalic-color;
+    color: @screen-foreground;
+    margin: 0px;
+}
+
+span {
+    font-style: italic;
+}
+
+input {
+    font-family: Consolas, sans-serif;
+    background-color: @screen-background;
+    color: @screen-foreground;
+    border: 2px @screen-foreground solid;
+    padding: 10px;
+    text-shadow: 2px 0px 2px @screen-foreground;
+    box-shadow: 2px 0px 2px @screen-foreground;
+}
+
+.zone {
+    border-radius: 50%;
+    width: 500px;
+    height: 500px;
+    background-color: #120;
+    box-shadow: 5px 5px 20px #000 inset;
+    overflow: hidden;
+    text-shadow: 2px 0px 2px @screen-foreground;
+}
+
+.content {
+    position: absolute;
+    left: 100px;
+    top: 100px;
+}
