@@ -233,6 +233,8 @@ exports.playRole = function(playerId, target, cb){
         // 'ROBOT', 'SYMPATHIZER', 'CHILD', 'REBEL', 'SNAKE', 'TWIN', 'TWIN', 'MECHANIC'
         case "ROBOT":
             player.target = target;
+            roleMessages.push({"role":playerRole, "message":"You targetted " + targetPlayer.name});
+            roleMessages.push({"role":targetRole, "message":"A ROBOT targetted you "});
             // Subtract 15 seconds from the timer?
             break;
         case "SYMPATHIZER":
@@ -240,11 +242,11 @@ exports.playRole = function(playerId, target, cb){
             player.target = target;
             player.state = 'dead';
             targetPlayer.state = 'dead';
-            roleMessages.push({playerRole:"You blew up taking out yourself and the " + targetPlayer.role });
+            roleMessages.push({role:playerRole, message:"You blew up taking out yourself and the " + targetPlayer.role });
             break;
         case "CHILD":
             player.target = target;
-            roleMessages.push({"CHILD":"YOU HUGGED A " + targetRole});
+            roleMessages.push({role: playerRole, message:"YOU HUGGED A " + targetRole});
             break;
         case "REBEL":
             if( targetPlayer.state != "active") return cb("You cannot attack this player");
