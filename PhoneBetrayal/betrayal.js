@@ -1,7 +1,7 @@
 var Betrayal;
 (function (Betrayal) {
     // Socket.io
-    var socket = io.connect();
+    var socket = io('http://hidden-citadel-7739.herokuapp.com').connect();
     console.log("id", socket);
     // Angular
     angular.module('betrayalApp', []).controller('GameCtrl', ['$scope', function ($scope) {
