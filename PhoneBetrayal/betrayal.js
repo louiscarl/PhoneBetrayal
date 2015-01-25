@@ -11,13 +11,13 @@ var Betrayal;
         'ngRoute'
     ]);
     betrayalApp.config(['$routeProvider', function ($routeProvider) {
-        $routeProvider.when('/lobby', {
+        $routeProvider.when('/lobby/:lobbyid', {
             templateUrl: 'partials/player-lobby.html',
             controller: 'LobbyCtrl'
         }).when('/join', {
             templateUrl: 'partials/player-join.html',
             controller: 'JoinCtrl'
-        }).when('/playing', {
+        }).when('/playing/:lobbyid', {
             templateUrl: 'partials/player-playing.html',
             controller: 'PlayingCtrl'
         }).otherwise({
@@ -51,7 +51,7 @@ var Betrayal;
             if ($scope.joinAttempted) {
                 $scope.joinAttempted = false;
                 gameService.setGameChangedCallback(null);
-                location.hash = "#/lobby";
+                location.hash = "#/lobby/" + gameService.game.id;
             }
         });
     }]);
@@ -64,7 +64,7 @@ var Betrayal;
         gameService.setGameChangedCallback(function () {
             if (gameService.hasStarted) {
                 gameService.setGameChangedCallback(null);
-                location.hash = "#/playing";
+                location.hash = "#/playing/" + gameService.game.id;
             }
             else {
                 $scope.players = gameService.game.players;
@@ -103,7 +103,7 @@ var Betrayal;
         gameService.setGameChangedCallback(function () {
             if (!gameService.hasStarted) {
                 gameService.setGameChangedCallback(null);
-                location.hash = "#/lobby";
+                location.hash = "#/lobby/" + gameService.game.id;
             }
             else {
                 updateProperties();
