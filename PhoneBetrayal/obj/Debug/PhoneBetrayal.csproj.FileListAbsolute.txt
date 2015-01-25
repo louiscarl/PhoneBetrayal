@@ -1,6 +1,0 @@
-C:\Users\LouisCarl\Documents\GitHub\PhoneBetrayal\PhoneBetrayal\obj\Debug\PhoneBetrayal.csprojResolveAssemblyReference.cache
-C:\Users\LouisCarl\Documents\GitHub\PhoneBetrayal\PhoneBetrayal\bin\PhoneBetrayal.dll.config
-C:\Users\LouisCarl\Documents\GitHub\PhoneBetrayal\PhoneBetrayal\bin\PhoneBetrayal.dll
-C:\Users\LouisCarl\Documents\GitHub\PhoneBetrayal\PhoneBetrayal\bin\PhoneBetrayal.pdb
-C:\Users\LouisCarl\Documents\GitHub\PhoneBetrayal\PhoneBetrayal\obj\Debug\PhoneBetrayal.dll
-C:\Users\LouisCarl\Documents\GitHub\PhoneBetrayal\PhoneBetrayal\obj\Debug\PhoneBetrayal.pdb
