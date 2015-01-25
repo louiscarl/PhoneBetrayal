@@ -159,7 +159,7 @@ exports.endRound = function(gameId, cb){
     if(!game) return cb("game not found", null);
     game.now = new Date().getTime();
     
-    game.state = 'ended';
+    game.state = 'endRound';
 
     // End of round class restrictions
     for(var p in game.players){
@@ -247,7 +247,8 @@ exports.playRole = function(playerId, target, cb){
     if(player.state != "active" && player.role != 'SNAKE') return cb("You cannot play an action now.");
     if(player.target !== null) return cb("You have already played your action");
     if(!targetPlayer) return cb("You must choose a target");
-
+    if(targetPlayer.state == 'disconnect') return cb("You cannot target disconnected players");
+    
     console.log(player.role + " -> " + targetPlayer.role);
 
     roleMessages = [];

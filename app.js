@@ -49,7 +49,8 @@ io.on('connection', function (socket) {
                 
             }
             
-            cb({game: res, player: gameController.getPlayer(uuid) });
+            if(typeof cb == 'function')
+                cb({game: res, player: gameController.getPlayer(uuid) });
         });
     });
 
