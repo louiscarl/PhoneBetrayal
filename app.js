@@ -95,7 +95,9 @@ io.on('connection', function (socket) {
             if(err) return cb(err);
             if(data.game) io.to(data.game.id).emit('game', data.game);
             if(data.role){
-                for (var roleMessage in data.role){
+                for (var x in data.role){
+                    roleMessage = data.role[x];
+                    console.log(roleMessage);
                     // roleMessage = data.role[x];
                     io.to(game.id).emit('role', roleMessage);
                 }

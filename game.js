@@ -252,13 +252,13 @@ exports.playRole = function(playerId, target, cb){
                 // Reverse them
                 player.state = "dead";
                 guardianPlayer.target = -1; // The only can help once
-                roleMessages.push({ playerRole :"You died trying to kill " + targetPlayer.name + " who was protected by the GUARDIAN"});
-                roleMessages.push({ guardianRole :"You protected the " + targetPlayer.name + " who was going to be killed by the " + player.role + "!"});
+                roleMessages.push({ role: playerRole, message:"You died trying to kill " + targetPlayer.name + " who was protected by the GUARDIAN"});
+                roleMessages.push({ role: guardianRole, message:"You protected the " + targetPlayer.name + " who was going to be killed by the " + player.role + "!"});
             }
             player.target = target;
             targetPlayer.state = "dead";
-            roleMessages.push({ playerRole :"You killed " + targetPlayer.name});
-            roleMessages.push({ targetRole :"You got killed by the rebel!"});
+            roleMessages.push({ role:playerRole, message:"You killed " + targetPlayer.name});
+            roleMessages.push({ role:targetRole, message:"You got killed by the rebel!"});
             break;
         case "SNAKE":
             if(targetPlayer.target != player.id) return cb ("You cannot attack this player");
@@ -266,30 +266,30 @@ exports.playRole = function(playerId, target, cb){
                 // Reverse them
                 player.state = "dead";
                 guardianPlayer.target = -1; // The only can help once
-                roleMessages.push({ playerRole :"You died trying to bite " + targetPlayer.name + " who was protected by the GUARDIAN"});
-                roleMessages.push({ guardianRole :"You protected the " + targetPlayer.name + " who was going to be killed by the " + player.role + "!"});
+                roleMessages.push({role: playerRole, message: "You died trying to bite " + targetPlayer.name + " who was protected by the GUARDIAN"});
+                roleMessages.push({role: guardianRole, message: "You protected the " + targetPlayer.name + " who was going to be killed by the " + player.role + "!"});
             }
             targetPlayer.state = "dead";
             targetRole = targetPlayer.role;
-            roleMessages.push({ playerRole : "You bit " + targetPlayer.name});
-            roleMessages.push({ targetRole :"You got bit by the snake!"});
+            roleMessages.push({role: playerRole, message: "You bit " + targetPlayer.name});
+            roleMessages.push({role: targetRole, message: "You got bit by the snake!"});
             break;
         case "TWIN":
             if(targetPlayer.role == "TWIN"){
                 player.target = target;
-                roleMessages.push({playerRole : player.name + "has found their twin!"});
+                roleMessages.push({role:playerRole, message: player.name + "has found their twin!"});
             }
             else
-                roleMessages.push({playerRole : player.name + " did not find their twin"});
+                roleMessages.push({role: playerRole , message: player.name + " did not find their twin"});
             break;
         case "MECHANIC":
             player.target = target;
-            roleMessages.push({ playerRole : "You have found the robot"});
+            roleMessages.push({role: playerRole, message: "You have found the robot"});
             break;
         case "GUARDIAN":
             if(targetPlayer.state != "active") return cb("You cannot protect them");
             player.target = target;
-            roleMessages.push({playerRole : "You protected " + targetPlayer.name});
+            roleMessages.push({role: playerRole, message: "You protected " + targetPlayer.name});
             break;
         default:
             return cb("You broke the game.");
