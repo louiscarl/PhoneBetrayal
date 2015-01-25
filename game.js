@@ -224,10 +224,13 @@ exports.playRole = function(playerId, target, cb){
     
     if(player.state != "active") return cb("You cannot play an action now.");
     if(player.target !== null) return cb("You have already played your action");
-    
+
     // Get the player's role
     var playerRole = player.role;
-    var targetRole = targetPlayer.role;
+    var targetRole = (targetPlayer) ? targetPlayer.role : null;
+
+    if(targetRole === null) return cb("You must choose a target");
+
     roleMessages = [];
     switch(playerRole){
         // 'ROBOT', 'SYMPATHIZER', 'CHILD', 'REBEL', 'SNAKE', 'TWIN', 'TWIN', 'MECHANIC'
