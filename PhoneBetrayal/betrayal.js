@@ -3,7 +3,7 @@ var Betrayal;
 (function (Betrayal) {
     var socket;
     // Socket.io
-    socket = null; //io('http://hidden-citadel-7739.herokuapp.com');
+    socket = io('http://hidden-citadel-7739.herokuapp.com');
     console.log("id", socket);
     // Angular
     var betrayalApp = angular.module('betrayalApp', [
@@ -74,24 +74,26 @@ var Betrayal;
         });
     }]);
     betrayalApp.controller('PlayingCtrl', ['$scope', 'gameService', function ($scope, gameService) {
-        $scope.enableClickOnPlayers = false;
-        $scope.roundTime = gameService.game.timer;
         var updateProperties = function () {
             $scope.role = gameService.player.role;
             $scope.name = gameService.name;
             $scope.action = gameService.game.deckActions[gameService.player.role];
-            $scope.requiresTarget = gameService.needsTarget();
+            $scope.targetWhenDead = gameService.targetWhenDead();
             $scope.canAct = gameService.canAct;
             $scope.isActionDisabled = $scope.requiresTarget || !$scope.canAct;
             $scope.isAlive = gameService.player.state === 'active';
+            var isTargetDisabled = !$scope.canAct || ($scope.targetWhenDead === $scope.isAlive);
             var otherPlayers = [];
             for (var i in gameService.otherPlayers) {
                 var player = gameService.otherPlayers[i];
-                otherPlayers.push({ id: player.id, name: player.name, isTargetDisabled: (!$scope.requiresTarget || !$scope.canAct || player.state !== 'active'), isAlive: player.state === 'active' });
+                otherPlayers.push({ id: player.id, name: player.name, isTargetDisabled: (isTargetDisabled || player.state !== 'active'), isAlive: player.state === 'active' });
             }
             $scope.otherPlayers = otherPlayers;
             $scope.messages = gameService.messages;
-            timer();
+            if ($scope.timerLength !== gameService.game.timer) {
+                $scope.timerLength = gameService.game.timer;
+                startRoundTimer(gameService.game.timer);
+            }
         };
         updateProperties();
         $scope.doAction = function (target) {

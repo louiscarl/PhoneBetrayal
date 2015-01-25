@@ -3,8 +3,8 @@ module Betrayal {
         playerNameCookie: "PlayerName"
     };
 
-    var TargetNotNeeded = [
-        "ROBOT"
+    var TargetWhenDead = [
+        "SNAKE"
     ];
 
     // GameService class
@@ -132,8 +132,8 @@ module Betrayal {
             this.socket.emit('playRole', { target: target }, this.onActionErrorCallback);
         }
 
-        needsTarget(): boolean {
-            return TargetNotNeeded.indexOf(this.player.role) < 0;
+        targetWhenDead(): boolean {
+            return TargetWhenDead.indexOf(this.player.role) >= 0;
         }
 
         onMessage(data: Betrayal.Server.IMessageData) {
