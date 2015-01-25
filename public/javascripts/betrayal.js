@@ -76,4 +76,12 @@ angular.module('betrayalApp', [])
             console.log("gameData received");
             $scope.loadGame(gameData);
         });
+
+        socket.on('role', function(data){
+            if(data.role == $scope.player.role){
+                // Display this message
+                alert(data.message);
+            }
+        })
+
     }]);

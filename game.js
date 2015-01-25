@@ -12,17 +12,19 @@ var playerToGame = {};
 
 // Betrayal Settings
 var maxPlayers = 12;
-var roundTimeLimit = 100;
+var roundTimeLimit = 10;
 var startLives = 5;
 
 var deckActions = {
     "ROBOT": "SUBTRACT 15 SECONDS FROM THE TIMER",
-    "SYMPATHIZER": "BLOW UP NON-ROBOT PLAYER",
+    "LIEBOT": "SEND A LIE TO A PLAYER",
+    "SYMPATHIZER":"BLOW UP NON-ROBOT PLAYER",
     "CHILD": "HUG A PLAYER TO CHECK FOR SQUISHY INSIDES",
     "REBEL": "KILL SOMEONE AND GET AWAY WITH IT",
     "SNAKE": "BITE A HUMAN WHO INTERACTED WITH YOU",
     "TWIN":"FIND YOUR TWIN",
-    "MECHANIC":"DISABLE THE ROBOT"
+    "MECHANIC":"DISABLE A ROBOT",
+    "GUARDIAN":"PROTECT SOMEONE ABOUT TO BE MURDERED"
 };
 
 var newDeck = function(possibles){
@@ -48,6 +50,7 @@ var init = function(cb){
 var newGame = function(cb){
     var game = {
         id:games.length,
+        now:new Date().getTime(),
         timer:roundTimeLimit,
         players:[],
         state:"prep",
@@ -64,10 +67,15 @@ var newRound = function(game){
         var player = game.players[p];
         player.role = deck.pop();
     }
-    game.timer = roundTimeLimit;
-    console.log("STARTING TIMEOUT");
-    timeouts[game.id] = setTimeout(exports.endRound, roundTimeLimit * 1000);
+    
     //TODO: Start the timer ticking
+    var now = new Date().getTime(); // Milliseconds
+    game.now = now;
+    var roundEnd = now + roundTimeLimit * 1000;
+    game.roundEnd = roundEnd;
+
+    timeouts[game.id] = setTimeout(function(){exports.endRound(game.id, function(err, data){console.log("ended"); exports.eventEmitter.emit('game', data.game)});}, roundTimeLimit * 1000);
+
 };
 
 exports.playerToGame = function(playerId, cb){
@@ -85,7 +93,7 @@ exports.join = function(uuid, cb){
         game = newGame();
         // games.push(game);
     }
-    // game.now = new Date().getTime()
+    game.now = new Date().getTime()
     var player = _.findWhere( game.players, {id: uuid} )
     if( typeof player === 'undefined'){
         var player = {
@@ -96,7 +104,6 @@ exports.join = function(uuid, cb){
             , state: 'active'
             , score: 0
         }
-        // Take a hand of cards from the deck
         playerToGame[player.id] = game.id;
     }
     if(_.where(game.players, {state:'active'}).length >= maxPlayers) player.state = 'spectating';
@@ -104,42 +111,45 @@ exports.join = function(uuid, cb){
     players.push(player); // All players
     game.players.push(player); // Players for the game
     
-    cb(null, game);
+    cb(null, {game:game});
 };
 
 exports.start = function(gameId, cb){
     var game = games[gameId];
+    
     if(!game) return cb("game not found", null);
+    game.now = new Date().getTime();
     // var activePlayers = _.find(game.players, function(player){(player.state=="active")});
     // if(!activePlayers || activePlayers.length < 2) return cb("Not enough players to start", null);
     if(game.players.length < 2) return cb("Not enough players to start", null);
     
     game.state = 'active';
     newRound(game);
-    cb(null, game);
+    cb(null, {game:game});
 };
 
 exports.endRound = function(gameId, cb){
     console.log("End Round");
-    game = games[gameId];
     if(timeouts[gameId]) {
         clearTimeout(timeouts[gameId]); // Just in case
         timeouts[gameId] = null;
     }
     var game = games[gameId];
     if(!game) return cb("game not found", null);
+    game.now = new Date().getTime();
     
     game.state = 'ended';
 
-    // Resolve the votes
+    //TODO: Resolve the winner
 
 
-    cb(null, game);
+    cb(null, {game:game});
 };
 
 exports.leave = function(gameId, uuid, cb){
     var game = games[gameId];
     if(!game) return;
+    game.now = new Date().getTime();
     // Remove their player
     var player = _.findWith(game.players, {id:uuid});
     if(player){
@@ -185,56 +195,91 @@ exports.playRole = function(playerId, target, cb){
     // Play a role to the group
     var gameId = playerToGame[playerId];
     var game = games[gameId];
+    if(!game) return cb("game not found", null);
+    game.now = new Date().getTime();
+
     var player = _.findWhere( game.players, {id: playerId} ); // game.players[id];
     var targetPlayer = _.findWhere( game.players, {id: target} );
+    var guardianPlayer = _.findWhere(game.players, {role: "GUARDIAN"});
+    var guardianRole = guardianPlayer.role;
 
     if(player.state != "active") return cb("You cannot play an action now.");
     if(player.target != null) return cb("You have already played your action");
     
     // Get the player's role
-    var playerRole = player.role
+    var playerRole = player.role;
+    var targetRole = target.role;
+    roleMessages = [];
     switch(playerRole){
         // 'ROBOT', 'SYMPATHIZER', 'CHILD', 'REBEL', 'SNAKE', 'TWIN', 'TWIN', 'MECHANIC'
         case "ROBOT":
+            // Subtract 15 seconds from the timer?
             break;
         case "SYMPATHIZER":
             if(targetPlayer.role == "ROBOT") return cb("Cannot blow up the robot");
+            player.state = 'dead';
             targetPlayer.state = 'dead';
+            roleMessages.append({playerRole:"You blew up taking out yourself and the " + targetPlayer.role });
             break;
         case "CHILD":
-            if(targetPlayer.state == "ROBOT")
-                return cb("YOU HUGGED A ROBOT", game);
+            roleMessages.append({"CHILD":"YOU HUGGED A " + targetRole});
             break;
         case "REBEL":
-            if( target.state == "active" ){
-                target.state = "dead";
+            if( target.state != "active") return cb("You cannot attack this player");
+            if( guardianPlayer.target == target){
+                // Reverse them
+                player.state = "dead";
+                guardianPlayer.target = -1; // The only can help once
+                roleMessages.append({ playerRole :"You died trying to kill " + target.name + " who was protected by the GUARDIAN"});
+                roleMessages.append({ guardianRole :"You protected the " + target.name + " who was going to be killed by the " + player.role + "!"});
             }
+            target.state = "dead";
+            roleMessages.append({ playerRole :"You killed " + target.name});
+            roleMessages.append({ targetRole :"You got killed by the rebel!"});
             break;
         case "SNAKE":
             if(target.target != player.id) return cb ("You cannot attack this player");
+            if( guardianPlayer.target == target){
+                // Reverse them
+                player.state = "dead";
+                guardianPlayer.target = -1; // The only can help once
+                roleMessages.append({ playerRole :"You died trying to bite " + target.name + " who was protected by the GUARDIAN"});
+                roleMessages.append({ guardianRole :"You protected the " + target.name + " who was going to be killed by the " + player.role + "!"});
+            }
             target.state = "dead";
+            targetRole = target.role;
+            roleMessages.append({ playerRole : "You bit " + target.name});
+            roleMessages.append({ targetRole :"You got bit by the snake!"});
             break;
         case "TWIN":
-            if(target.state == "TWIN") return cb("You have found your twin!");
+            if(target.role == "TWIN")
+                roleMessages.append({playerRole : player.name + "has found their twin!"});
+            else
+                roleMessages.append({playerRole : player.name + " did not find their twin"});
             break;
         case "MECHANIC":
-            if(target.role == "ROBOT") return cb("You have found the robot");
+            roleMessages.append({ playerRole : "You have found the robot"});
+            break;
+        case "GUARDIAN":
+            if(targetPlayer.state != "active") return cb("You cannot protect them");
+            player.target = target;
+            roleMessages.append({playerRole : "You protected " + target.name});
             break;
         default:
+            return cb("You broke the game.");
             break;
-
     }
         
 
     // Do the role
 
 
-    cb(null, game);
+    cb(null, {game:game, role:roleMessages});
 }
 
 exports.reset = function(cb){
     init()
-    cb(null, game)
+    cb(null, game);
 }
 
 init()
