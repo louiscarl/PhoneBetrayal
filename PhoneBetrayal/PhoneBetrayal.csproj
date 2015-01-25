@@ -39,6 +39,7 @@
     <TypeScriptCompile Include="scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="scripts\typings\server\betrayal-server.d.ts" />
     <TypeScriptCompile Include="scripts\typings\socket.io-client\socket.io-client.d.ts" />
+    <TypeScriptCompile Include="styles.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
