@@ -7,6 +7,7 @@ exports.eventEmitter = new EventEmitter();
 
 var games=[];
 var players = [];
+var timeouts = [];
 var playerToGame = {};
 
 // Betrayal Settings
@@ -64,7 +65,8 @@ var newRound = function(game){
         player.role = deck.pop();
     }
     game.timer = roundTimeLimit;
-    game.currentTimeout = setTimeout(endRound(), roundTimeLimit * 1000);
+    console.log("STARTING TIMEOUT");
+    timeouts[game.id] = setTimeout(exports.endRound, roundTimeLimit * 1000);
     //TODO: Start the timer ticking
 };
 
@@ -118,9 +120,11 @@ exports.start = function(gameId, cb){
 };
 
 exports.endRound = function(gameId, cb){
-    if(game.currentTimeout) {
-        clearTimeout(); // Just in case
-        game.currentTimeout = null;
+    console.log("End Round");
+    game = games[gameId];
+    if(timeouts[gameId]) {
+        clearTimeout(timeouts[gameId]); // Just in case
+        timeouts[gameId] = null;
     }
     var game = games[gameId];
     if(!game) return cb("game not found", null);
