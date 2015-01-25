@@ -20,6 +20,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <TypeScriptCompile Include="betrayal.ts" />
+    <None Include="app.less" />
     <Content Include="index.html" />
     <Content Include="partials\player-playing.html" />
     <Content Include="partials\player-lobby.html" />
