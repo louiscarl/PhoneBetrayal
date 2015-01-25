@@ -1,12 +1,15 @@
-﻿@metalic-color: #222;
-@screen-background: #250;
-@screen-foreground: @screen-background + #220;
+﻿@metalic-color: #6A7059;
+@screen-background: #003D5C;
+@screen-shadow: #003D5C;
+@screen-highlight: #9BCC93;
+@screen-foreground: #1A9481;/*#9BCC93*/
 
 body {
     font-family: Consolas, sans-serif;
-    background-color: @metalic-color;
+    background-color: @screen-background;
     color: @screen-foreground;
     margin: 0px;
+	overflow: hidden;
 }
 
 h1 {
@@ -15,50 +18,36 @@ h1 {
 }
 
 .background {
-	background: url('img/1509-grunge-metal-textures.jpg');
-	opacity: 0.2;
-	position: absolute;
-	width: 100%;
-	height: 100%;
+	background: -webkit-linear-gradient(270deg, @screen-background 90%, @screen-foreground 100%);
 	z-index: -1;
-}
-
-body .background {
-	background: url('img/1509-grunge-metal-textures.jpg');
-}
-
-.zone .background {
-	/*background: url('img/noise.png');*/
-	background: -webkit-linear-gradient(270deg, @screen-background 70%, @screen-foreground 100%);
-	z-index: 0;
 	animation: horiz_move 10s infinite linear;
 	-webkit-animation: horiz_move 10s infinite linear;
-	border-radius: 50%;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	transform: translate3d(0%, -100%, 0px);
 }
 
 @-webkit-keyframes horiz_move {
 	0% {
-		background-position: 0px 0px;
+		transform: translate3d(0%, -100%, 0px);
 		opacity: 0;
 	}
 	5% {
+		transform: translate3d(0%, -100%, 0px);
 		opacity: 1;
 	}
 	10% {
-		background-position: 0px 500px;
+		transform: translate3d(0%, 50%, 0px);
 		opacity: 0.5;
 	}
 	20% {
 		opacity: 0;
 	}
 	100% {
-		background-position: 0px 500px;
+		transform: translate3d(0%, 50%, 0px);
 		opacity: 0;
 	}
-}
-
-span {
-    font-style: italic;
 }
 
 input, button {
@@ -75,6 +64,11 @@ input, button {
 }
 
 button {
+    background-color: @screen-background;
+    color: @screen-highlight;
+    border: 2px @screen-highlight solid;
+    text-shadow: 2px 0px 2px @screen-highlight;
+    box-shadow: 2px 0px 2px @screen-highlight;
 	width: 324px;
 	height: 40px;
 }
@@ -85,18 +79,17 @@ input:focus {
 }
 
 .zone {
-    border-radius: 50%;
-    width: 500px;
-    height: 500px;
+    width: 100%;
+    height: 100%;
     background-color: @screen-background;
-    box-shadow: 5px 5px 20px #000 inset;
+    box-shadow: 5px 5px 10px @screen-shadow inset;
     overflow: hidden;
     text-shadow: 2px 0px 2px @screen-foreground;
 	position: absolute;
 }
 
 .content {
-    position: relative;
+    position: absolute;
     left: 90px;
     top: 150px;
 	z-index: 1;

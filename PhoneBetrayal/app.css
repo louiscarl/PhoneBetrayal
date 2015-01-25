@@ -1,88 +1,83 @@
+/*#9BCC93*/
 body {
   font-family: Consolas, sans-serif;
-  background-color: #222222;
-  color: #447700;
+  background-color: #003d5c;
+  color: #1a9481;
   margin: 0px;
+  overflow: hidden;
 }
 h1 {
   font-size: 50px;
   margin: 10px 0px;
 }
 .background {
-  background: url('img/1509-grunge-metal-textures.jpg');
-  opacity: 0.2;
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  background: -webkit-linear-gradient(270deg, #003d5c 90%, #1a9481 100%);
   z-index: -1;
-}
-body .background {
-  background: url('img/1509-grunge-metal-textures.jpg');
-}
-.zone .background {
-  /*background: url('img/noise.png');*/
-  background: -webkit-linear-gradient(270deg, #225500 70%, #447700 100%);
-  z-index: 0;
   animation: horiz_move 10s infinite linear;
   -webkit-animation: horiz_move 10s infinite linear;
-  border-radius: 50%;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  transform: translate3d(0%, -100%, 0px);
 }
 @-webkit-keyframes horiz_move {
   0% {
-    background-position: 0px 0px;
+    transform: translate3d(0%, -100%, 0px);
     opacity: 0;
   }
   5% {
+    transform: translate3d(0%, -100%, 0px);
     opacity: 1;
   }
   10% {
-    background-position: 0px 500px;
+    transform: translate3d(0%, 50%, 0px);
     opacity: 0.5;
   }
   20% {
     opacity: 0;
   }
   100% {
-    background-position: 0px 500px;
+    transform: translate3d(0%, 50%, 0px);
     opacity: 0;
   }
-}
-span {
-  font-style: italic;
 }
 input,
 button {
   font-family: Consolas, sans-serif;
-  background-color: #225500;
-  color: #447700;
-  border: 2px #447700 solid;
+  background-color: #003d5c;
+  color: #1a9481;
+  border: 2px #1a9481 solid;
   padding: 10px;
-  text-shadow: 2px 0px 2px #447700;
-  box-shadow: 2px 0px 2px #447700;
+  text-shadow: 2px 0px 2px #1a9481;
+  box-shadow: 2px 0px 2px #1a9481;
   width: 300px;
   height: 20px;
   margin: 5px;
 }
 button {
+  background-color: #003d5c;
+  color: #9bcc93;
+  border: 2px #9bcc93 solid;
+  text-shadow: 2px 0px 2px #9bcc93;
+  box-shadow: 2px 0px 2px #9bcc93;
   width: 324px;
   height: 40px;
 }
 input:focus {
-  border: 2px #447700 solid;
+  border: 2px #1a9481 solid;
   outline: none;
 }
 .zone {
-  border-radius: 50%;
-  width: 500px;
-  height: 500px;
-  background-color: #225500;
-  box-shadow: 5px 5px 20px #000 inset;
+  width: 100%;
+  height: 100%;
+  background-color: #003d5c;
+  box-shadow: 5px 5px 10px #003d5c inset;
   overflow: hidden;
-  text-shadow: 2px 0px 2px #447700;
+  text-shadow: 2px 0px 2px #1a9481;
   position: absolute;
 }
 .content {
-  position: relative;
+  position: absolute;
   left: 90px;
   top: 150px;
   z-index: 1;
