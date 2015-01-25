@@ -2,6 +2,77 @@ module Betrayal {
     declare var io;
     declare var angular;
 
+    class GameService {
+        playerId: string;
+
+        game: any;
+
+        player: any;
+
+        otherPlayers: Array<any>;
+
+        constructor() {
+            this.playerId = null;
+        }
+
+        loadGame (gameData: any) {
+            this.game = gameData;
+            console.log("Game is now", this.game);
+            for (var x in this.game.players) {
+                var p = this.game.players[x];
+                if (p.id === this.playerId) {
+                    this.player = p;
+                    // Shift players at the current player
+                    this.otherPlayers = this.game.players.slice(x + 1).concat(this.game.players.slice(0, x));
+                    break;
+                }
+            }
+
+            // this.$digest();
+        }
+
+        loadPlayer = function (playerData: any) {
+            this.player = playerData;
+            console.log("Player is now", this.player);
+            //gameService.$digest();
+        }
+    
+        // Used to iterate each life
+        range = function (n) {
+            return new Array(n);
+        }
+
+        startGame = function () {
+            console.log("startGame");
+            socket.emit('start', function (err, game) {
+                console.log(err, game);
+
+            });
+        }
+
+        endRound = function () {
+            console.log("endRound");
+            socket.emit('end', function (err, game) {
+                console.log(err, game);
+
+            });
+        }
+
+        playCard = function (i) {
+            // Get the card
+            var card = this.player.hand[i];
+            console.log("Play card", i, card);
+            socket.emit('playCard', { card: i }, function (err) {
+                if (err) console.log(err);
+            });
+
+        }
+
+        setName = function (name) {
+            socket.emit('name', { "name": name });
+        }
+    }     
+
     // Socket.io
     var socket = io.connect();
     console.log("id", socket);
@@ -14,85 +85,52 @@ module Betrayal {
     betrayalApp.config(['$routeProvider',
         function ($routeProvider) {
             $routeProvider.
+                when('/lobby', {
+                    templateUrl: 'partials/player-lobby.html',
+                    controller: 'LobbyCtrl'
+                }).
                 when('/join', {
-                templateUrl: 'partials/player-join.html',
-                controller: 'GameCtrl'
-            }).
+                    templateUrl: 'partials/player-join.html',
+                    controller: 'JoinCtrl'
+                }).
+                when('/playing', {
+                    templateUrl: 'partials/player-playing.html',
+                    controller: 'PlayingCtrl'
+                }).
                 otherwise({
-                redirectTo: '/join'
-            });
+                    redirectTo: '/join'
+                });
         }]);
 
-    betrayalApp.controller('GameCtrl', ['$scope', function($scope) {
-            $scope.playerId = 0;
+    betrayalApp.factory('gameService', [function () {
+        var gameService = new GameService();
 
-            $scope.loadGame = function(gameData){
-                $scope.game = gameData;
-                console.log("Game is now", $scope.game);
-                for( var x in $scope.game.players){
-                    var p = $scope.game.players[x];
-                    if(p.id === $scope.playerId){
-                        $scope.player = p;
-                        // Shift players at the current player
-                        $scope.otherPlayers = $scope.game.players.slice(x+1).concat( $scope.game.players.slice(0,x) );
-                        break;
-                    }
-                }
-                $scope.$digest();
-            };
+        socket.emit('join', function (data) {
+            // Join the game, get our player id back
+            console.log("joined", data);
+            gameService.playerId = data.player.id;
+            gameService.loadGame(data.game);
+            // gameService.loadPlayer(data.player);
+        });
 
-            $scope.loadPlayer = function(playerData){
-                $scope.player = playerData;
-                console.log("Player is now", $scope.player);
-                $scope.$digest();
-            };
-    
-            // Used to iterate each life
-            $scope.range = function(n) {
-                return new Array(n);
-            };
+        socket.on('game', function (gameData) {
+            console.log("gameData received");
+            gameService.loadGame(gameData);
+        });
 
-            $scope.startGame = function(){
-                console.log("startGame");
-                socket.emit('start', function(err, game) {
-                    console.log(err, game);
+        return gameService;
+    }]);
 
-                });
-            };
+    betrayalApp.controller('JoinCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
+        $scope.join = function (user) {
+            gameService.setName(user.name);
+            location.hash = "#/lobby";
+        };
+    }]);
 
-            $scope.endRound = function(){
-                console.log("endRound");
-                socket.emit('end', function(err, game) {
-                    console.log(err, game);
+    betrayalApp.controller('LobbyCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
+    }]);
 
-                });
-            };
-
-            $scope.playCard = function(i){
-                // Get the card
-                var card = $scope.player.hand[i];
-                console.log("Play card", i, card);
-                socket.emit('playCard', {card:i}, function(err) {
-                    if(err) console.log(err);
-                });
-            
-            };
-
-            $scope.setName = function (name) {
-                socket.emit('name', { "name": name });
-            };
-    
-            socket.emit('join', function(data){
-                // Join the game, get our player id back
-                console.log("joined", data);
-                $scope.playerId = data.player.id;
-                $scope.loadGame(data.game);
-                // $scope.loadPlayer(data.player);
-            });
-
-            socket.on('game', function(gameData){
-                console.log("gameData received");
-                $scope.loadGame(gameData);
-            });
-        }]);
+    betrayalApp.controller('PlayingCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
+    }]);
 }
