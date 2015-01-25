@@ -85,6 +85,8 @@ var newRound = function(game){
         player.target = null;
         if(player.state == 'dead') player.state = 'active';
         player.success = false;
+
+        game.players[p] = player;
     }
     
     //TODO: Start the timer ticking
@@ -171,7 +173,10 @@ exports.endRound = function(gameId, cb){
 
 
         // Finally, give them points if success
-        if(player.success) player.score++;
+        if(player.success){ 
+            console.log(player.role + " gets a point");
+            player.score++;
+        };
     }
     
     cb(null, {game:game});
@@ -243,6 +248,8 @@ exports.playRole = function(playerId, target, cb){
     if(player.target !== null) return cb("You have already played your action");
     if(!targetPlayer) return cb("You must choose a target");
 
+    console.log(player.role + " -> " + targetPlayer.role);
+
     roleMessages = [];
     switch(player.role){
         // "ROBOT": "KILL A HUMAN",
@@ -257,7 +264,7 @@ exports.playRole = function(playerId, target, cb){
         case "ROBOT":
             // If it's a human, kill them
             player.target = target;
-            if(humans.indexOf(targetPlayer.role) != -1 && targetPlayer.state == 'active') {
+            if(robots.indexOf(targetPlayer.role) != -1 || targetPlayer.state != 'active') {
                 // Failure
                 roleMessages.push({"role":player.role, "message":"You failed to kill " + targetPlayer.name + "(" + targetPlayer.state + ")"});
                 break;
