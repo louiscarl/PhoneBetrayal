@@ -30,6 +30,9 @@ var Betrayal;
             console.log("gameData received");
             gameService.loadGame(gameData);
         });
+        socket.on('role', function (data) {
+            gameService.onMessage(data);
+        });
         return gameService;
     }]);
     betrayalApp.controller('JoinCtrl', ['$scope', 'gameService', function ($scope, gameService) {
@@ -70,17 +73,20 @@ var Betrayal;
     }]);
     betrayalApp.controller('PlayingCtrl', ['$scope', 'gameService', function ($scope, gameService) {
         $scope.canAct = true;
+        $scope.enableClickOnPlayers = false;
         var updateProperties = function () {
             $scope.role = gameService.player.role;
             $scope.name = gameService.name;
             $scope.action = gameService.game.deckActions[gameService.player.role];
             $scope.otherPlayers = gameService.otherPlayers;
+            $scope.messages = gameService.messages;
+            $scope.requiresTarget = gameService.needsTarget();
         };
         updateProperties();
-        $scope.doAction = function () {
+        $scope.doAction = function (target) {
             if ($scope.canAct) {
                 $scope.canAct = false;
-                gameService.playCard(0);
+                gameService.actOnTarget(target);
             }
         };
         gameService.setGameChangedCallback(function () {

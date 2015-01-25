@@ -1,11 +1,19 @@
 ﻿<div ng-controller="PlayingCtrl">
-    <div>Time</div>
-    <div>News goes here</div>
-    <div>Role: {{role}}</div>
-    <div>Action: <button ng-disabled="!canAct" ng-click="doAction()">{{action}}</button></div>
-    <div><div>Players</div>
+    <h2>Time</h2>
+    <div><h3>News</h3>
         <ul>
-            <li ng-repeat="p in otherPlayers track by $index">{{ p.name }}</li>
+            <li ng-repeat="m in messages">{{ m }}</li>
+        </ul>
+    </div>
+    <div><h3>Role</h3>
+        <div>{{role}}</div>
+    </div>
+    <div><h3>Action</h3>
+        <button ng-disabled="!canAct || requiresTarget" ng-click="doAction('')">{{action}}</button>
+    </div>
+    <div><h3>Players</h3>
+        <ul>
+            <li ng-repeat="p in otherPlayers track by $index"><button ng-disabled="!canAct || !requiresTarget" ng-click="doAction('{{p.id}}')">{{p.name}}</button></li>
         </ul>
     </div>
 </div>

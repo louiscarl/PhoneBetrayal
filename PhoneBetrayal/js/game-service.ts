@@ -3,6 +3,11 @@ module Betrayal {
         playerNameCookie: "PlayerName"
     };
 
+    var TargetNotNeeded = [
+        "ROBOT",
+        "GUARDIAN"
+    ];
+
     // GameService class
     export class GameService {
         playerId: string;
@@ -17,6 +22,8 @@ module Betrayal {
 
         socket: SocketIOClient.Socket;
 
+        messages: Array<string>;
+
         private gameChangedCallback: Function;
 
         private startGameCallback: Function;
@@ -30,6 +37,7 @@ module Betrayal {
             this.playerId = null;
             this.cookieStore = cookieStore;
             this.socket = socket;
+            this.messages = [];
             this.name = cookieStore.get(GameServiceConstants.playerNameCookie) || "";
         }
 
@@ -72,7 +80,7 @@ module Betrayal {
                 this.gameChangedCallback();
             }
         }
-    
+
         startGame() {
             console.log("startGame");
             this.socket.emit('start', function (err, game: Betrayal.Server.IGame) {
@@ -88,14 +96,29 @@ module Betrayal {
             });
         }
 
-        playCard(i : number) {
+        actOnTarget(target: string) {
             // Get the card
-            var card = this.player.hand[i];
-            console.log("Play card", i, card);
-            this.socket.emit('playCard', { card: i }, function (err) {
+            console.log("Play role", target);
+            this.socket.emit('playRole', { target: target }, function (err) {
                 if (err) console.log(err);
             });
 
+        }
+
+        needsTarget(): boolean {
+            return TargetNotNeeded.indexOf(this.player.role) > -1;
+        }
+
+        onMessage(data: Map<string,string>) {
+            var message = data[this.player.role];
+            if (message) {
+                // Display this message
+                this.messages.unshift(message);
+
+                if (this.gameChangedCallback) {
+                    this.gameChangedCallback();
+                }
+            }
         }
 
         private onGameJoined(data: Betrayal.Server.IJoinResponseData) {

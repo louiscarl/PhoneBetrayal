@@ -7,7 +7,6 @@
         lives: number;
         state: string;
         score: number;
-        hand: Array<string>;
     }
 
     interface IGame {

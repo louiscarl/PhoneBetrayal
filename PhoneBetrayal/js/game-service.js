@@ -3,6 +3,10 @@ var Betrayal;
     var GameServiceConstants = {
         playerNameCookie: "PlayerName"
     };
+    var TargetNotNeeded = [
+        "ROBOT",
+        "GUARDIAN"
+    ];
     // GameService class
     var GameService = (function () {
         function GameService(socket, cookieStore) {
@@ -10,6 +14,7 @@ var Betrayal;
             this.playerId = null;
             this.cookieStore = cookieStore;
             this.socket = socket;
+            this.messages = [];
             this.name = cookieStore.get(GameServiceConstants.playerNameCookie) || "";
         }
         GameService.prototype.loadGame = function (gameData) {
@@ -59,14 +64,26 @@ var Betrayal;
                 console.log(err, game);
             });
         };
-        GameService.prototype.playCard = function (i) {
+        GameService.prototype.actOnTarget = function (target) {
             // Get the card
-            var card = this.player.hand[i];
-            console.log("Play card", i, card);
-            this.socket.emit('playCard', { card: i }, function (err) {
+            console.log("Play role", target);
+            this.socket.emit('playRole', { target: target }, function (err) {
                 if (err)
                     console.log(err);
             });
+        };
+        GameService.prototype.needsTarget = function () {
+            return TargetNotNeeded.indexOf(this.player.role) > -1;
+        };
+        GameService.prototype.onMessage = function (data) {
+            var message = data[this.player.role];
+            if (message) {
+                // Display this message
+                this.messages.unshift(message);
+                if (this.gameChangedCallback) {
+                    this.gameChangedCallback();
+                }
+            }
         };
         GameService.prototype.onGameJoined = function (data) {
             this.socket.emit('name', { "name": this.name });

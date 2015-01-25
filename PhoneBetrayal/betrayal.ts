@@ -43,6 +43,10 @@ module Betrayal {
             gameService.loadGame(gameData);
         });
 
+        socket.on('role', function (data: Map<string, string>) {
+            gameService.onMessage(data);
+        })
+
         return gameService;
     }]);
 
@@ -96,18 +100,22 @@ module Betrayal {
 
         $scope.canAct = true;
 
+        $scope.enableClickOnPlayers = false;
+
         var updateProperties = function () {
             $scope.role = gameService.player.role;
             $scope.name = gameService.name;
             $scope.action = gameService.game.deckActions[gameService.player.role];
             $scope.otherPlayers = gameService.otherPlayers;
+            $scope.messages = gameService.messages;
+            $scope.requiresTarget = gameService.needsTarget();
         };
         updateProperties();
 
-        $scope.doAction = function () {
+        $scope.doAction = function (target) {
             if ($scope.canAct) {
                 $scope.canAct = false;
-                gameService.playCard(0);
+                gameService.actOnTarget(target);
             }
         };
 
