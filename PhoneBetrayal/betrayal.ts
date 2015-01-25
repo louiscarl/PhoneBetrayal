@@ -3,7 +3,7 @@ module Betrayal {
     declare var angular;
 
     // Socket.io
-    var socket = io('http://hidden-citadel-7739.herokuapp.com').connect();
+    var socket = null;//io('http://hidden-citadel-7739.herokuapp.com').connect();
     console.log("id", socket);
 
     // Angular

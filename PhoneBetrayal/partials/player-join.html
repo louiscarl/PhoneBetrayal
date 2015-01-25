@@ -1,10 +1,11 @@
 ﻿<div ng-controller="GameCtrl">
 	<div class="zone">
+		<div class="background"></div>
 		<div class="content">
-			<h2>Enter Name</h2>
+			<h1>Enter Name</h1>
 			<form novalidate>
 				<input ng-model="user.name" autocomplete="off" />
-				<input type="submit" ng-click="join(user)" value="Join" />
+				<button ng-click="join(user)">Join</button>
 			</form>
 		</div>
 	</div>

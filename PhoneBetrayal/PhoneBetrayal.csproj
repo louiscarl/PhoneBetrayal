@@ -21,6 +21,8 @@
     <Content Include="app.css" />
     <TypeScriptCompile Include="betrayal.ts" />
     <None Include="app.less" />
+    <Content Include="img\1509-grunge-metal-textures.jpg" />
+    <Content Include="img\noise.png" />
     <Content Include="index.html" />
     <Content Include="partials\player-join.html" />
     <Content Include="web.config" />
