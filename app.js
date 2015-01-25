@@ -49,11 +49,11 @@ io.on('connection', function (socket) {
     socket.on('start', function(cb){
         var gameId = gameController.playerToGame(socket.id);
         gameController.start(gameId, function(err, data){
-            game = data.game;
             if(!err) {
+                game = data.game;
                 io.to(gameId).emit('game', game);
             }
-            return cb(err, game);
+            return cb(err, null);
         });
 
     });
