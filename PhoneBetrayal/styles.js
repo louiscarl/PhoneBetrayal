@@ -27,7 +27,7 @@ function timerTick() {
     }
     var minutes = Math.floor(timerTime / MIN_TO_MILLI);
     var seconds = Math.floor((timerTime - minutes * MIN_TO_MILLI) / 1000);
-    timer_displ.innerText = timeToString(minutes, seconds);
+    timer_displ.textContent = timeToString(minutes, seconds);
     if (minutes === 0) {
         timer_displ.className = 'timer_urgent';
         if (seconds < 20) {
