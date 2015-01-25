@@ -1,7 +1,9 @@
 ﻿<div ng-controller="LobbyCtrl">
-    <h2>Players</h2>
-    <div>
-        <span ng-repeat="p in players track by $index">{{ p.name }}</span>
-    </div>
-    <button ng-click='startGame()'>Start Game</button>
+	<div class="content">
+		<h1>Players</h1>
+		<div>
+			<span class="list_element" ng-repeat="p in players track by $index">{{ p.name }}</span>
+		</div>
+		<button ng-click='startGame()'>Start Game</button>
+	</div>
 </div>

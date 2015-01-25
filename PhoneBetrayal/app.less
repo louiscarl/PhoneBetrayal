@@ -73,9 +73,19 @@ button {
 	height: 40px;
 }
 
-input:focus {
+input:focus, button:focus {
 	border: 2px @screen-foreground solid;
 	outline: none;
+}
+
+.list_element {
+    background-color: @screen-background;
+    color: @screen-highlight;
+    border: 2px @screen-highlight solid;
+    text-shadow: 2px 0px 2px @screen-highlight;
+    box-shadow: 2px 0px 2px @screen-highlight;
+	width: 324px;
+	height: 40px;
 }
 
 .zone {
@@ -93,4 +103,8 @@ input:focus {
     left: 90px;
     top: 150px;
 	z-index: 1;
+}
+
+.timer_urgent {
+	color: @screen-highlight
 }

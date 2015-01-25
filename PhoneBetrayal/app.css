@@ -63,9 +63,19 @@ button {
   width: 324px;
   height: 40px;
 }
-input:focus {
+input:focus,
+button:focus {
   border: 2px #1a9481 solid;
   outline: none;
+}
+.list_element {
+  background-color: #003d5c;
+  color: #9bcc93;
+  border: 2px #9bcc93 solid;
+  text-shadow: 2px 0px 2px #9bcc93;
+  box-shadow: 2px 0px 2px #9bcc93;
+  width: 324px;
+  height: 40px;
 }
 .zone {
   width: 100%;
@@ -81,4 +91,7 @@ input:focus {
   left: 90px;
   top: 150px;
   z-index: 1;
+}
+.timer_urgent {
+  color: #9bcc93;
 }
