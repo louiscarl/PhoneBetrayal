@@ -12,7 +12,7 @@ var playerToGame = {};
 
 // Betrayal Settings
 var maxPlayers = 12;
-var roundTimeLimit = 20;
+var roundTimeLimit = 40;
 
 var deckActions = {
     "ROBOT": "KILL A HUMAN",
