@@ -26,6 +26,7 @@
     <Content Include="partials\player-lobby.html" />
     <Content Include="partials\player-join.html" />
     <Content Include="web.config" />
+    <TypeScriptCompile Include="js\game-service.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-cookies.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-mocks.d.ts" />
