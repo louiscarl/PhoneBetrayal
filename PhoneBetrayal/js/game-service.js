@@ -51,10 +51,6 @@ var Betrayal;
                 this.hasStarted = false;
                 this.canAct = false;
             }
-            if (this.canAct && (this.player.state !== 'active')) {
-                this.canAct = false;
-                this.messages.unshift("You dead");
-            }
             if (this.gameChangedCallback) {
                 this.gameChangedCallback();
             }
@@ -113,12 +109,12 @@ var Betrayal;
             }
         };
         GameService.prototype.onGameJoined = function (data) {
-            this.socket.emit('name', { "name": this.name });
             // Join the game, get our player id back
             console.log("joined", data);
             if (data.player) {
                 this.playerId = data.player.id;
                 this.isConnected = true;
+                this.socket.emit('name', { "name": this.name });
                 this.loadGame(data.game);
             }
             else {

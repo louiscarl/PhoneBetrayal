@@ -81,11 +81,6 @@ module Betrayal {
                 this.canAct = false;
             }
 
-            if (this.canAct && (this.player.state !== 'active')) {
-                this.canAct = false;
-                this.messages.unshift("You dead");
-            }
-
             if (this.gameChangedCallback) {
                 this.gameChangedCallback();
             }
@@ -165,12 +160,12 @@ module Betrayal {
         }
 
         private onGameJoined(data: Betrayal.Server.IJoinResponseData) {
-            this.socket.emit('name', { "name": this.name });
             // Join the game, get our player id back
             console.log("joined", data);
             if (data.player) {
                 this.playerId = data.player.id;
                 this.isConnected = true;
+                this.socket.emit('name', { "name": this.name });
                 this.loadGame(data.game);
             } else {
                 // let the UI know we failed to connect

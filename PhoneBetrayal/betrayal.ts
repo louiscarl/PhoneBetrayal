@@ -138,7 +138,6 @@ module Betrayal {
             $scope.action = gameService.game.deckActions[gameService.player.role];
             $scope.targetWhenDead = gameService.targetWhenDead();
             $scope.canAct = gameService.canAct;
-            $scope.isActionDisabled = $scope.requiresTarget || !$scope.canAct;
             $scope.isAlive = gameService.player.state === 'active';
             var isTargetDisabled = !$scope.canAct || ($scope.targetWhenDead === $scope.isAlive);
             var otherPlayers = [];
