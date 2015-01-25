@@ -6,7 +6,7 @@ module Betrayal {
     var socket: SocketIOClient.Socket;
 
     // Socket.io
-    socket = io('http://hidden-citadel-7739.herokuapp.com');
+    socket = null;//io('http://hidden-citadel-7739.herokuapp.com');
     console.log("id", socket);
 
     // Angular
@@ -116,6 +116,8 @@ module Betrayal {
             }
             $scope.otherPlayers = otherPlayers;
             $scope.messages = gameService.messages;
+
+            timer();
         };
         updateProperties();
 

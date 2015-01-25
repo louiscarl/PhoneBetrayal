@@ -1,19 +1,22 @@
 ﻿<div ng-controller="PlayingCtrl">
+	<div class="float">
+		<img class="card_image" src="img/rebel.png" />
+	</div>
 	<h1 id="timer_display">00:00</h1>
-    <div><h3>News</h3>
+    <div class="section">
+		<h2>News</h2>
         <ul>
             <li ng-repeat="m in messages">{{ m }}</li>
         </ul>
     </div>
-    <div><h3>Role</h3>
-        <div>{{role}}</div>
-    </div>
-    <div><h3>Action</h3>
-        <button ng-disabled="isActionDisabled" ng-click="doAction('')">{{action}}</button>
-    </div>
-    <div><h3>Players</h3>
-        <ul>
-            <li ng-repeat="p in otherPlayers track by $index"><button ng-disabled="p.isTargetDisabled" ng-click="doAction(p.id)">{{p.name}}<span ng-hide="p.isAlive">(dead)</span></button></li>
-        </ul>
-    </div>
+	<div class="section">
+		<h2>Action</h2>
+		<button ng-disabled="isActionDisabled" ng-click="doAction('')">{{action}}</button>
+	</div>
+	<div class="section">
+		<h2>Players</h2>
+		<ul>
+			<li ng-repeat="p in otherPlayers track by $index"><button ng-disabled="p.isTargetDisabled" ng-click="doAction(p.id)">{{p.name}}<span ng-hide="p.isAlive">(dead)</span></button></li>
+		</ul>
+	</div>
 </div>

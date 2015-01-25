@@ -3,7 +3,7 @@ var Betrayal;
 (function (Betrayal) {
     var socket;
     // Socket.io
-    socket = io('http://hidden-citadel-7739.herokuapp.com');
+    socket = null; //io('http://hidden-citadel-7739.herokuapp.com');
     console.log("id", socket);
     // Angular
     var betrayalApp = angular.module('betrayalApp', [
@@ -91,6 +91,7 @@ var Betrayal;
             }
             $scope.otherPlayers = otherPlayers;
             $scope.messages = gameService.messages;
+            timer();
         };
         updateProperties();
         $scope.doAction = function (target) {

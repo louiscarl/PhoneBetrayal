@@ -1,5 +1,5 @@
 ﻿@metalic-color: #6A7059;
-@screen-background: #003D5C;
+@screen-background: #003D5C - #111;
 @screen-shadow: #003D5C;
 @screen-highlight: #9BCC93;
 @screen-foreground: #1A9481;/*#9BCC93*/
@@ -15,6 +15,11 @@ body {
 h1 {
 	font-size: 50px;
 	margin: 10px 0px;
+    text-align: center;
+}
+
+h2 {
+    padding-left: 10px;
 }
 
 .background {
@@ -140,4 +145,19 @@ input:focus, button:focus {
     100% {
         opacity: 1;
     }
+}
+
+.card_image {
+    width: 100%;
+    text-align: center;
+    position: relative;
+}
+
+.float {
+    position: absolute;
+    top: 0px;
+    opacity: 0.1;
+}
+
+.section {
 }
