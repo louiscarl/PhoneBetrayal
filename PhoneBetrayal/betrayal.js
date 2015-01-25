@@ -75,7 +75,7 @@ var Betrayal;
     }]);
     betrayalApp.controller('PlayingCtrl', ['$scope', 'gameService', function ($scope, gameService) {
         var getImageUrl = function (role) {
-            return 'img/rolePortraits/jpg/' + role.toLowerCase() + '.png';
+            return 'img/rolePortraits/jpg/' + role.toLowerCase() + '.jpg';
         };
         var updateProperties = function () {
             $scope.role = gameService.player.role;

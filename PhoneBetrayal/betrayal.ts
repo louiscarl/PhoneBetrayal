@@ -99,7 +99,7 @@ module Betrayal {
     betrayalApp.controller('PlayingCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
 
         var getImageUrl = function (role: string) {
-            return 'img/rolePortraits/jpg/' + role.toLowerCase() + '.png';
+            return 'img/rolePortraits/jpg/' + role.toLowerCase() + '.jpg';
         };
         var updateProperties = function () {
             $scope.role = gameService.player.role;
