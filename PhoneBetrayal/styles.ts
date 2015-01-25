@@ -28,6 +28,10 @@ function timerTick() {
     var diff = newNow - timerStart;
     var timerTime = (durationInSeconds * SEC_TO_MILLI) - diff;
     
+    if (timerTime < 0) {
+        timerTime = 0;
+    } 
+
     var minutes = Math.floor(timerTime / MIN_TO_MILLI);
     var seconds = Math.floor((timerTime - minutes * MIN_TO_MILLI) / 1000);
 
