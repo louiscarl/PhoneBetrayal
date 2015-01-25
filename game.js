@@ -12,7 +12,7 @@ var playerToGame = {};
 
 // Betrayal Settings
 var maxPlayers = 12;
-var roundTimeLimit = 10;
+var roundTimeLimit = 20;
 
 var deckActions = {
     "ROBOT": "SUBTRACT 15 SECONDS FROM THE TIMER",
