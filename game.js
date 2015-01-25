@@ -17,7 +17,7 @@ var roundTimeLimit = 40;
 var deckActions = {
     "ROBOT": "KILL A HUMAN",
     "ROBO-MINION": "ASSOCIATE WITH ANOTHER ACTIVATED ROBOT",
-    "ROBO-RPG":"BLOW UP YOURSELF AND PLAYER, SUCCEED IF IT'S A HUMAN",
+    "THE-BOMB":"BLOW UP YOURSELF AND PLAYER, SUCCEED IF IT'S A HUMAN",
     "CHILD": "HUG A LIVE HUMAN",
     "REBEL": "KILL A PLAYER AND STAY ALIVE",
     "SNAKE": "DIE, THEN KILL THE PLAYER WHO KILLED YOU",
@@ -29,7 +29,7 @@ var deckActions = {
 var robots = [
     "ROBOT",
     "ROBO-MINION",
-    "ROBO-RPG",
+    "THE-BOMB",
 ];
 
 var humans = [
@@ -47,7 +47,7 @@ var newDeck = function(possibles){
     //TODO: For each class in the possible array, add the correct number of cards
 
     deck = [
-        'ROBOT', 'ROBO-MINION', 'ROBO-RPG', 'CHILD', 'REBEL', 'SNAKE', 'TWIN', 'TWIN', 'MECHANIC', 'GUARDIAN'
+        'ROBOT', 'ROBO-MINION', 'THE-BOMB', 'CHILD', 'REBEL', 'SNAKE', 'TWIN', 'TWIN', 'MECHANIC', 'GUARDIAN'
     ];
     //TODO: Cut it to players + 1
 
@@ -248,15 +248,6 @@ exports.playRole = function(playerId, target, cb){
 
     roleMessages = [];
     switch(player.role){
-        // "ROBOT": "KILL A HUMAN",
-        // "ROBO-MINION": "ASSOCIATE WITH ANOTHER ACTIVATED ROBOT",
-        // "ROBO-RPG":"BLOW UP NON-ROBOT PLAYER",
-        // "CHILD": "HUG A LIVE HUMAN",
-        // "REBEL": "KILL A PLAYER AND STAY ALIVE",
-        // "SNAKE": "DIE, THEN KILL THE PLAYER WHO KILLED YOU",
-        // "TWIN":"FIND YOUR TWIN (THEY CAN ALSO FIND YOU)",
-        // "MECHANIC":"DISABLE A LIVE ROBOT",
-        // "GUARDIAN":"PROTECT SOMEONE BEFORE THEY ARE ELIMINATED"
         case "ROBOT":
             // If it's a human, kill them
             player.target = target;
@@ -283,7 +274,7 @@ exports.playRole = function(playerId, target, cb){
                 roleMessages.push({"role":player.role, "message":"You failed, " + targetPlayer.name + " is not a robot."});
             }
             break;
-        case "ROBO-RPG":
+        case "THE-BOMB":
             player.target = target;
             if(humans.indexOf(targetPlayer.role) != -1 && targetPlayer.state == 'active'){
                 player.success = true;
@@ -334,7 +325,7 @@ exports.playRole = function(playerId, target, cb){
         case "TWIN":
             player.target = target;
             if(targetPlayer.role == "TWIN"){
-                roleMessages.push({role:player.role, message: player.name + "has found their twin!"});
+                roleMessages.push({role:player.role, message: player.name + " has found their twin!"});
                 player.success = true;
                 targetPlayer.success = true;
             }
