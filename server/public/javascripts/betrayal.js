@@ -50,17 +50,17 @@ angular.module('betrayalApp', [])
             });
         };
 
-        $scope.playCard = function(i){
+        $scope.playRole = function(target){
             // Get the card
-            var card = $scope.player.hand[i];
-            console.log("Play card", i, card);
-            socket.emit('playCard', {card:i}, function(err){
+            console.log("Play role", target);
+            socket.emit('playRole', {target:target}, function(err){
                 if(err) console.log(err);
             });
             
         };
 
-        $scope.setName = function(name){
+        $scope.setName = function(){
+            var name = prompt("Enter a name:");
             socket.emit('name', {"name":name});
         }
     
@@ -76,4 +76,12 @@ angular.module('betrayalApp', [])
             console.log("gameData received");
             $scope.loadGame(gameData);
         });
+
+        socket.on('role', function(data){
+            if(data.role == $scope.player.role){
+                // Display this message
+                alert(data.message);
+            }
+        })
+
     }]);
