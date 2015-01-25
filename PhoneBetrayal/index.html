@@ -1,17 +1,16 @@
 ﻿<!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" ng-app="betrayalApp">
 <head>
     <meta charset="utf-8" />
     <title>Phone Betrayal</title>
     <link rel="stylesheet" href="app.css" type="text/css" />
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
-	<script src="https://cdn.socket.io/socket.io-1.3.2.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular-route.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.3.2.js"></script>
     <script src="betrayal.js"></script>
 </head>
 <body>
-    <h1>Phone Betrayal</h1>
-
-    <div id="content"></div>
+    <div ng-view></div>
 </body>
 </html>

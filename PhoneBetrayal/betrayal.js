@@ -4,7 +4,18 @@ var Betrayal;
     var socket = io('http://hidden-citadel-7739.herokuapp.com').connect();
     console.log("id", socket);
     // Angular
-    angular.module('betrayalApp', []).controller('GameCtrl', ['$scope', function ($scope) {
+    var betrayalApp = angular.module('betrayalApp', [
+        'ngRoute'
+    ]);
+    betrayalApp.config(['$routeProvider', function ($routeProvider) {
+        $routeProvider.when('/join', {
+            templateUrl: 'partials/player-join.html',
+            controller: 'GameCtrl'
+        }).otherwise({
+            redirectTo: '/join'
+        });
+    }]);
+    betrayalApp.controller('GameCtrl', ['$scope', function ($scope) {
         $scope.playerId = 0;
         $scope.loadGame = function (gameData) {
             $scope.game = gameData;
