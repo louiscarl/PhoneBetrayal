@@ -17,6 +17,8 @@ module Betrayal {
 
         socket: SocketIOClient.Socket;
 
+        private gameChangedCallback: Function;
+
         private startGameCallback: Function;
 
         private hasStarted: boolean;
@@ -52,13 +54,18 @@ module Betrayal {
                 this.hasStarted = false;
             }
 
-            // this.$digest();
+            if (this.gameChangedCallback) {
+                this.gameChangedCallback();
+            }
         }
 
         loadPlayer(playerData: Betrayal.Server.IPlayer) {
             this.player = playerData;
             console.log("Player is now", this.player);
-            //gameService.$digest();
+
+            if (this.gameChangedCallback) {
+                this.gameChangedCallback();
+            }
         }
     
         startGame() {
@@ -96,6 +103,10 @@ module Betrayal {
 
         setStartGameCallback(callback: Function) {
             this.startGameCallback = callback;
+        }
+
+        setGameChangedCallback(callback: Function) {
+            this.gameChangedCallback = callback;
         }
     }     
 }

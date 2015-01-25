@@ -55,20 +55,27 @@ module Betrayal {
     }]);
 
     betrayalApp.controller('JoinCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
+        $scope.joinAttempted = false;
+
         $scope.playerName = gameService.name;
 
         $scope.joinGame = function () {
-            if ($scope.playerName.length >= 2) {
+            if (!$scope.joinAttempted && ($scope.playerName.length >= 2)) {
+                $scope.joinAttempted = true;
                 gameService.setName($scope.playerName);
-                location.hash = "#/lobby";
             }
         };
+
+        gameService.setGameChangedCallback(function () {
+            if ($scope.joinAttempted) {
+                $scope.joinAttempted = false;
+                location.hash = "#/lobby";
+            }
+        });
     }]);
 
     betrayalApp.controller('LobbyCtrl', ['$scope', 'gameService', function ($scope, gameService: GameService) {
-        $scope.getPlayers = function () {
-            return gameService.game.players;
-        };
+        $scope.players = gameService.game.players;
 
         $scope.startGame = function () {
             gameService.startGame();
@@ -76,6 +83,10 @@ module Betrayal {
 
         gameService.setStartGameCallback(function () {
             location.hash = "#/playing";
+        });
+
+        gameService.setGameChangedCallback(function () {
+            $scope.$digest();
         });
     }]);
 

@@ -32,12 +32,16 @@ var Betrayal;
             else if (this.hasStarted && (this.game.state == "ended")) {
                 this.hasStarted = false;
             }
-            // this.$digest();
+            if (this.gameChangedCallback) {
+                this.gameChangedCallback();
+            }
         };
         GameService.prototype.loadPlayer = function (playerData) {
             this.player = playerData;
             console.log("Player is now", this.player);
-            //gameService.$digest();
+            if (this.gameChangedCallback) {
+                this.gameChangedCallback();
+            }
         };
         GameService.prototype.startGame = function () {
             console.log("startGame");
@@ -69,6 +73,9 @@ var Betrayal;
         };
         GameService.prototype.setStartGameCallback = function (callback) {
             this.startGameCallback = callback;
+        };
+        GameService.prototype.setGameChangedCallback = function (callback) {
+            this.gameChangedCallback = callback;
         };
         return GameService;
     })();
