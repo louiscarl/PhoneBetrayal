@@ -376,7 +376,7 @@ var guardianSave = function(player, targetPlayer, guardianPlayer){
     guardianPlayer.success = true;
     guardianPlayer.target = -1; // The only can help once
     roleMessages.push({role: player.role, message: "You tried to kill the " + targetPlayer.role + " who was protected by the GUARDIAN"});
-    roleMessages.push({role: guardian.role, message: "You protected the " + targetPlayer.role + " who was going to be killed by the " + player.role + "!"});
+    roleMessages.push({role: guardianPlayer.role, message: "You protected the " + targetPlayer.role + " who was going to be killed by the " + player.role + "!"});
 };
 
 exports.reset = function(cb){
