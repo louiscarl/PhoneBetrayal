@@ -21,6 +21,7 @@
     <Content Include="app.css" />
     <TypeScriptCompile Include="betrayal.ts" />
     <Content Include="index.html" />
+    <Content Include="partials\player-join.html" />
     <Content Include="web.config" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-cookies.d.ts" />
