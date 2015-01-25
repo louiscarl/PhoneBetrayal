@@ -74,7 +74,7 @@ var newRound = function(game){
     var roundEnd = now + roundTimeLimit * 1000;
     game.roundEnd = roundEnd;
 
-    timeouts[game.id] = setTimeout(function(){exports.endRound(game.id, function(err, data){console.log("ended"); exports.eventEmitter.emit('game', data.game)});}, roundTimeLimit * 1000);
+    timeouts[game.id] = setTimeout(function(){exports.endRound(game.id, function(err, data){console.log("ended"); exports.eventEmitter.emit('timeout', data.game)});}, roundTimeLimit * 1000);
 
 };
 
