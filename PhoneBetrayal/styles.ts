@@ -7,11 +7,11 @@
 
 }
 
-var now = 0;
+var timerStart = 0;
+var durationInSeconds = 0;
+var SEC_TO_MILLI = 1000;
 var MIN_TO_MILLI = 60 * 1000;
-var DURATION = 0.5 * MIN_TO_MILLI; // minutes
 var timer_displ: HTMLElement;
-var LAST_MIN = MIN_TO_MILLI;
 
 function timeToString(minutes, seconds) {
     if (minutes < 10) {
@@ -25,9 +25,13 @@ function timeToString(minutes, seconds) {
 
 function timerTick() {
     var newNow = window.performance.now();
-    var diff = newNow - now;
-    var timerTime = DURATION - diff;
+    var diff = newNow - timerStart;
+    var timerTime = (durationInSeconds * SEC_TO_MILLI) - diff;
     
+    if (timerTime < 0) {
+        timerTime = 0;
+    } 
+
     var minutes = Math.floor(timerTime / MIN_TO_MILLI);
     var seconds = Math.floor((timerTime - minutes * MIN_TO_MILLI) / 1000);
 
@@ -44,8 +48,9 @@ function timerTick() {
     setTimeout(timerTick, 100);
 }
 
-function timer() {
+function startRoundTimer(duration: number) {
     timer_displ = document.getElementById('timer_display');
-    now = window.performance.now();
+    timerStart = window.performance.now();
+    durationInSeconds = duration;
     timerTick();
 }

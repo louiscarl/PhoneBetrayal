@@ -3,8 +3,8 @@ var Betrayal;
     var GameServiceConstants = {
         playerNameCookie: "PlayerName"
     };
-    var TargetNotNeeded = [
-        "ROBOT"
+    var TargetWhenDead = [
+        "SNAKE"
     ];
     // GameService class
     var GameService = (function () {
@@ -91,8 +91,8 @@ var Betrayal;
             console.log("Play role", target);
             this.socket.emit('playRole', { target: target }, this.onActionErrorCallback);
         };
-        GameService.prototype.needsTarget = function () {
-            return TargetNotNeeded.indexOf(this.player.role) < 0;
+        GameService.prototype.targetWhenDead = function () {
+            return TargetWhenDead.indexOf(this.player.role) >= 0;
         };
         GameService.prototype.onMessage = function (data) {
             if ((this.hasStarted) && (data.role === this.player.role)) {
