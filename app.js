@@ -61,7 +61,7 @@ io.on('connection', function (socket) {
 
     socket.on('end', function(cb){
         var gameId = gameController.playerToGame(socket.id);
-        gameController.end(gameId, function(err, game){
+        gameController.endRound(gameId, function(err, game){
             if(!err) {
                 console.log("Ending game", gameId);
                 io.to(gameId).emit('game', game);
@@ -81,13 +81,16 @@ io.on('connection', function (socket) {
 
     // User chooses a name
     socket.on('name', function(data, cb){
-        gameController.setName(socket.id, data.name, cb)
+        gameController.setName(socket.id, data.name, cb);
     });
 
     // User plays their role action
     socket.on('playRole', function(data, cb){
-
-    })
+        gameController.playRole(socket.id, data.target, function(info, game){
+            if(game) io.to(game.id).emit('game', game);
+            cb(info);
+        });
+    });
 
     // User plays a card
     socket.on('playCard', function(data, cb){
