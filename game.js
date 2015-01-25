@@ -61,6 +61,7 @@ var newGame = function(cb){
 };
 
 var newRound = function(game){
+    console.log("newRound");
     // Give everyone a role
     var deck = newDeck();
     for(var p in game.players){
@@ -115,6 +116,7 @@ exports.join = function(uuid, cb){
 };
 
 exports.start = function(gameId, cb){
+    console.log("gameController.start");
     var game = games[gameId];
     
     if(!game) return cb("game not found", null);

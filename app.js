@@ -109,8 +109,10 @@ io.on('connection', function (socket) {
         });
     });
 
-    gameController.eventEmitter.on('timeout', function(game){
-        io.to(game.id).emit('game', game);
-    });
+});
 
+
+gameController.eventEmitter.on('timeout', function(game){
+    console.log("EventEmitter");
+    io.to(game.id).emit('game', game);
 });
