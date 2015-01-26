@@ -125,7 +125,8 @@ exports.join = function(uuid, cb){
         playerToGame[player.id] = game.id;
     } else {
         // Skip adding it to the group
-        console.log("Player already exists")
+        console.log("Player already exists", player);
+        if(player.state == 'disconnected') player.state = 'active';
         return cb(null, {game:game});
     }
     // if(_.where(game.players, {state:'active'}).length >= maxPlayers) player.state = 'spectating';
@@ -350,7 +351,7 @@ exports.playRole = function(playerId, target, cb){
         case "GUARDIAN":
             if(targetPlayer.state != "active") return cb("You cannot protect them");
             player.target = target;
-            roleMessages.push({role: player.role, message: "You protected " + targetPlayer.name});
+            roleMessages.push({role: player.role, message: "You are protecting " + targetPlayer.name});
             break;
         default:
             return cb("You broke the game.");
