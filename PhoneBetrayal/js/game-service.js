@@ -54,7 +54,7 @@ var Betrayal;
                 this.canAct = true;
                 this.messages = [];
             }
-            else if (this.hasStarted && (this.game.state == "ended")) {
+            else if (this.hasStarted && ((this.game.state == "endRound") || (this.game.state == "ended"))) {
                 this.hasStarted = false;
                 this.canAct = false;
             }

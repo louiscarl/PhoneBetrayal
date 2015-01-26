@@ -78,8 +78,20 @@ var Betrayal;
             location.hash = "#/lobby/" + gameService.game.id;
             return;
         }
-        $scope.players = gameService.game.players;
-        $scope.isDisabled = $scope.players.length < 2;
+        var updateProperties = function () {
+            var players = [];
+            for (var i in gameService.otherPlayers) {
+                var player = gameService.otherPlayers[i];
+                players.push({ id: player.id, name: player.name, role: player.role, hasWon: player.success && player.role, hasLost: !player.success && player.role });
+            }
+            $scope.players = players;
+            $scope.playerName = gameService.player.name;
+            $scope.role = gameService.player.role;
+            $scope.hasLost = gameService.player.success && gameService.player.role;
+            $scope.hasWon = gameService.player.success && gameService.player.role;
+            $scope.isDisabled = $scope.players.length < 1;
+        };
+        updateProperties();
         $scope.startGame = function () {
             gameService.startGame();
         };
@@ -89,8 +101,7 @@ var Betrayal;
                 location.hash = "#/playing/" + gameService.game.id;
             }
             else {
-                $scope.players = gameService.game.players;
-                $scope.isDisabled = $scope.players.length < 2;
+                updateProperties();
                 $scope.$digest();
             }
         });

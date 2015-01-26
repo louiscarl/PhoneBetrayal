@@ -7,6 +7,7 @@
         lives: number;
         state: string;
         score: number;
+        success: boolean;
     }
 
     interface IGame {

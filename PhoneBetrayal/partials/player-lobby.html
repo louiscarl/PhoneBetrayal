@@ -1,9 +1,19 @@
 ﻿<div ng-controller="LobbyCtrl">
 	<div class="content">
-		<h1>Players</h1>
-		<ul>
-			<li ng-repeat="p in players track by $index">{{ p.name }}</li>
-		</ul>
-		<button ng-click='startGame()' ng-disabled="isDisabled">Start Game</button>
-	</div>
+        <div class="section">
+            <h2>Name</h2>
+            <div>{{playerName}}</div>
+        </div>
+        <div class="section" ng-hide="!role">
+            <h2>Last Game</h2>
+            <span ng-hide="!hasWon">You won as {{role}}</span><span ng-hide="!hasLost">You last as {{role}}</span>
+        </div>
+        <div class="section">
+            <h2>Other Players</h2>
+            <ul>
+                <li ng-repeat="p in players track by $index">{{p.name}}<span ng-hide="!p.hasWon">won as {{p.role}}</span><span ng-hide="!p.hasLost">lost as {{p.role}}</span></li>
+            </ul>
+        </div>
+        <button ng-click='startGame()' ng-disabled="isDisabled">Start Game</button>
+    </div>
 </div>
