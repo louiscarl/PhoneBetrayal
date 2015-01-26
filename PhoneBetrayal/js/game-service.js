@@ -136,7 +136,7 @@ var Betrayal;
         };
         GameService.prototype.joinGame = function () {
             this.isJoining = true;
-            this.socket.emit('join', this.onGameJoined.bind(this));
+            this.socket.emit('join', { name: this.name }, this.onGameJoined.bind(this));
         };
         GameService.prototype.setName = function (name) {
             if (this.name !== name) {
