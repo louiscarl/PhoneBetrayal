@@ -15,16 +15,31 @@ var maxPlayers = 12;
 var roundTimeLimit = 20;
 
 var deckActions = {
-    "ROBOT": "SUBTRACT 15 SECONDS FROM THE TIMER",
-    "LIEBOT": "SEND A LIE TO A PLAYER",
-    "SYMPATHIZER":"BLOW UP NON-ROBOT PLAYER",
-    "CHILD": "HUG A PLAYER TO CHECK FOR SQUISHY INSIDES",
-    "REBEL": "KILL SOMEONE AND GET AWAY WITH IT",
-    "SNAKE": "BITE A HUMAN WHO INTERACTED WITH YOU",
-    "TWIN":"FIND YOUR TWIN",
-    "MECHANIC":"DISABLE A ROBOT",
-    "GUARDIAN":"PROTECT SOMEONE ABOUT TO BE MURDERED"
+    "ROBOT": "KILL A HUMAN",
+    "ROBO-MINION": "ASSOCIATE WITH ANOTHER ACTIVATED ROBOT",
+    "ROBO-RPG":"BLOW UP YOURSELF AND PLAYER, SUCCEED IF IT'S A HUMAN",
+    "CHILD": "HUG A LIVE HUMAN",
+    "REBEL": "KILL A PLAYER AND STAY ALIVE",
+    "SNAKE": "DIE, THEN KILL THE PLAYER WHO KILLED YOU",
+    "TWIN":"FIND YOUR TWIN (THEY CAN ALSO FIND YOU)",
+    "MECHANIC":"DISABLE A LIVE ROBOT",
+    "GUARDIAN":"PROTECT SOMEONE BEFORE THEY ARE ELIMINATED"
 };
+
+var robots = [
+    "ROBOT",
+    "ROBO-MINION",
+    "ROBO-RPG",
+];
+
+var humans = [
+    "CHILD",
+    "REBEL",
+    "SNAKE",
+    "TWIN",
+    "MECHANIC",
+    "GUARDIAN"
+];
 
 var newDeck = function(possibles){
     // Make a deck of possible roles
@@ -32,7 +47,7 @@ var newDeck = function(possibles){
     //TODO: For each class in the possible array, add the correct number of cards
 
     deck = [
-        'ROBOT', 'SYMPATHIZER', 'CHILD', 'REBEL', 'SNAKE', 'TWIN', 'TWIN', 'MECHANIC'
+        'ROBOT', 'ROBO-MINION', 'ROBO-RPG', 'CHILD', 'REBEL', 'SNAKE', 'TWIN', 'TWIN', 'MECHANIC', 'GUARDIAN'
     ];
     //TODO: Cut it to players + 1
 
@@ -53,6 +68,7 @@ var newGame = function(cb){
         timer:roundTimeLimit,
         players:[],
         state:"prep",
+        success:false,
         deckActions:deckActions
     };
     games.push(game);
@@ -60,7 +76,6 @@ var newGame = function(cb){
 };
 
 var newRound = function(game){
-    console.log("newRound");
     // Give everyone a role
     var deck = newDeck();
     for(var p in game.players){
@@ -68,6 +83,9 @@ var newRound = function(game){
         player.role = deck.pop();
         player.target = null;
         if(player.state == 'dead') player.state = 'active';
+        player.success = false;
+
+        game.players[p] = player;
     }
     
     //TODO: Start the timer ticking
@@ -76,12 +94,11 @@ var newRound = function(game){
     var roundEnd = now + roundTimeLimit * 1000;
     game.roundEnd = roundEnd;
 
-    timeouts[game.id] = setTimeout(function(){exports.endRound(game.id, function(err, data){console.log("ended"); exports.eventEmitter.emit('timeout', data.game);});}, roundTimeLimit * 1000);
+    timeouts[game.id] = setTimeout(function(){exports.endRound(game.id, function(err, data){exports.eventEmitter.emit('timeout', data.game);});}, roundTimeLimit * 1000);
 
 };
 
 exports.playerToGame = function(playerId, cb){
-    console.log("playerToGame", playerId, playerToGame[playerId]);
     return playerToGame[playerId];
 };
 
@@ -116,7 +133,6 @@ exports.join = function(uuid, cb){
 };
 
 exports.start = function(gameId, cb){
-    console.log("gameController.start");
     var game = games[gameId];
     
     if(!game) return cb("game not found", null);
@@ -131,7 +147,6 @@ exports.start = function(gameId, cb){
 };
 
 exports.endRound = function(gameId, cb){
-    console.log("End Round");
     if(timeouts[gameId]) {
         clearTimeout(timeouts[gameId]); // Just in case
         timeouts[gameId] = null;
@@ -142,20 +157,24 @@ exports.endRound = function(gameId, cb){
     
     game.state = 'ended';
 
-    //TODO: Resolve the winner
+    // End of round class restrictions
     for(var p in game.players){
         var player = game.players[p];
-        if(player.state == 'active') player.score++;
-        // else if(['ROBOT', 'SYMPATHIZER', 'SNAKE'].contains(player.role))
-        //     player.score++;
         if(player.role == 'MECHANIC' && player.state == 'active' && player.target){
             targetPlayer = _.findWhere(game.players, {id:player.target});
-            targetPlayer.score++;
+            // targetPlayer.score++;
         }
-        if(player.role == 'SNAKE' && player.target) player.score++;
-        if(player.role == 'GUARDIAN' && player.target == -1) player.score++;
-    }
+        // REBEL must be alive to get points
+        if(player.role == 'REBEL' && player.state == 'dead') player.success = false;
 
+
+        // Finally, give them points if success
+        if(player.success){ 
+            console.log(player.role + " gets a point");
+            player.score++;
+        };
+    }
+    
     cb(null, {game:game});
 };
 
@@ -220,91 +239,153 @@ exports.playRole = function(playerId, target, cb){
     var player = _.findWhere( game.players, {id: playerId} ); // game.players[id];
     var targetPlayer = _.findWhere( game.players, {id: target} );
     var guardianPlayer = _.findWhere(game.players, {role: "GUARDIAN"});
-    var guardianRole = (guardianPlayer) ? guardianPlayer.role : null;
     
-    if(player.state != "active") return cb("You cannot play an action now.");
+    if(player.state != "active" && player.role != 'SNAKE') return cb("You cannot play an action now.");
     if(player.target !== null) return cb("You have already played your action");
+    if(!targetPlayer) return cb("You must choose a target");
 
-    // Get the player's role
-    var playerRole = player.role;
-    var targetRole = (targetPlayer) ? targetPlayer.role : null;
-
-    if(targetRole === null) return cb("You must choose a target");
+    console.log(player.role + " -> " + targetPlayer.role);
 
     roleMessages = [];
-    switch(playerRole){
-        // 'ROBOT', 'SYMPATHIZER', 'CHILD', 'REBEL', 'SNAKE', 'TWIN', 'TWIN', 'MECHANIC'
+    switch(player.role){
+        // "ROBOT": "KILL A HUMAN",
+        // "ROBO-MINION": "ASSOCIATE WITH ANOTHER ACTIVATED ROBOT",
+        // "ROBO-RPG":"BLOW UP NON-ROBOT PLAYER",
+        // "CHILD": "HUG A LIVE HUMAN",
+        // "REBEL": "KILL A PLAYER AND STAY ALIVE",
+        // "SNAKE": "DIE, THEN KILL THE PLAYER WHO KILLED YOU",
+        // "TWIN":"FIND YOUR TWIN (THEY CAN ALSO FIND YOU)",
+        // "MECHANIC":"DISABLE A LIVE ROBOT",
+        // "GUARDIAN":"PROTECT SOMEONE BEFORE THEY ARE ELIMINATED"
         case "ROBOT":
+            // If it's a human, kill them
             player.target = target;
-            roleMessages.push({"role":playerRole, "message":"You targetted " + targetPlayer.name});
-            roleMessages.push({"role":targetRole, "message":"A ROBOT targetted you "});
+            if(robots.indexOf(targetPlayer.role) != -1 || targetPlayer.state != 'active') {
+                // Failure
+                roleMessages.push({"role":player.role, "message":"You failed to kill " + targetPlayer.name + "(" + targetPlayer.state + ")"});
+                break;
+            }
+            if( guardianPlayer && guardianPlayer.target == target){
+                guardianSave(player, targetPlayer, guardianPlayer);
+                break;
+            }
+            player.success = true;
+            targetPlayer.state = 'dead';
+            roleMessages.push({"role":player.role, "message":"You killed " + targetPlayer.name});
+            roleMessages.push({"role":targetPlayer.role, "message":"A ROBOT killed you "});
             // Subtract 15 seconds from the timer?
             break;
-        case "SYMPATHIZER":
-            if(targetPlayer.role == "ROBOT") return cb("Cannot blow up the robot");
+        case "ROBO-MINION":
+            if(robots.indexOf(targetPlayer.role) != -1 && targetPlayer.state == 'active'){
+                player.success = true;
+                roleMessages.push({"role":player.role, "message":"You found the " + targetPlayer.role + "!"});
+            } else {
+                roleMessages.push({"role":player.role, "message":"You failed, " + targetPlayer.name + " is not a robot."});
+            }
+            break;
+        case "ROBO-RPG":
             player.target = target;
+            if(humans.indexOf(targetPlayer.role) != -1 && targetPlayer.state == 'active'){
+                player.success = true;
+                roleMessages.push({"role":player.role, "message":"You killed the human " + targetPlayer.role + "!"});
+            } else {
+                roleMessages.push({"role":player.role, "message":"You failed and killed the robot " + targetPlayer.role + "!"});
+            }
+            roleMessages.push({role:targetPlayer.role, message:"You have died from a " + player.role});
             player.state = 'dead';
             targetPlayer.state = 'dead';
-            roleMessages.push({role:playerRole, message:"You blew up taking out yourself and the " + targetPlayer.role });
             break;
         case "CHILD":
             player.target = target;
-            roleMessages.push({role: playerRole, message:"YOU HUGGED A " + targetRole});
+            if(humans.indexOf(targetPlayer.role) != -1 && targetPlayer.state == 'active')
+                player.success = true;
+            roleMessages.push({role: player.role, message:"YOU HUGGED A " + targetPlayer.role});
             break;
         case "REBEL":
             if( targetPlayer.state != "active") return cb("You cannot attack this player");
-            if( guardianPlayer && guardianPlayer.target == target){
-                // Reverse them
-                player.state = "dead";
-                guardianPlayer.target = -1; // The only can help once
-                roleMessages.push({ role: playerRole, message:"You died trying to kill " + targetPlayer.name + " who was protected by the GUARDIAN"});
-                roleMessages.push({ role: guardianRole, message:"You protected the " + targetPlayer.name + " who was going to be killed by the " + player.role + "!"});
-            }
             player.target = target;
+            if( guardianPlayer && guardianPlayer.target == target){
+                guardianSave(player, targetPlayer, guardianPlayer);
+                break;
+            }
+            player.success = true;
             targetPlayer.state = "dead";
-            roleMessages.push({ role:playerRole, message:"You killed " + targetPlayer.name});
-            roleMessages.push({ role:targetRole, message:"You got killed by the rebel!"});
+            roleMessages.push({ role:player.role, message:"You killed " + targetPlayer.name});
+            roleMessages.push({ role:targetPlayer.role, message:"You got killed by the rebel!"});
             break;
         case "SNAKE":
-            if(targetPlayer.target != player.id) return cb ("You cannot attack this player");
+            if(player.state != 'dead') return cb ("You are not dead.");
+            player.target = target;
             if( guardianPlayer && guardianPlayer.target == target){
-                // Reverse them
-                player.state = "dead";
-                guardianPlayer.target = -1; // The only can help once
-                roleMessages.push({role: playerRole, message: "You died trying to bite " + targetPlayer.name + " who was protected by the GUARDIAN"});
-                roleMessages.push({role: guardianRole, message: "You protected the " + targetPlayer.name + " who was going to be killed by the " + player.role + "!"});
+                guardianSave(player, targetPlayer, guardianPlayer);
+                roleMessages.push({role: player.role, message: "Your bite was foiled by the GUARDIAN! "});
+                roleMessages.push({role: targetPlayer.role, message: "The GUARDIAN saved you!"});
+            } else if (targetPlayer.target == player.id && targetPlayer.state == 'active') {
+                player.success = true;
+                targetPlayer.state = "dead";
+                targetPlayer.role = targetPlayer.role;
+                roleMessages.push({role: player.role, message: "You bit the " + targetPlayer.role});
+                roleMessages.push({role: targetPlayer.role, message: "You got bit by the snake!"});
+            } else {
+                // Fail state
+                roleMessages.push({role: player.role, message: "You failed to bite " + targetPlayer.role + "(" + targetPlayer.state + ")"});
             }
-            targetPlayer.state = "dead";
-            targetRole = targetPlayer.role;
-            roleMessages.push({role: playerRole, message: "You bit " + targetPlayer.name});
-            roleMessages.push({role: targetRole, message: "You got bit by the snake!"});
             break;
         case "TWIN":
+            player.target = target;
             if(targetPlayer.role == "TWIN"){
-                player.target = target;
-                roleMessages.push({role:playerRole, message: player.name + "has found their twin!"});
+                roleMessages.push({role:player.role, message: player.name + "has found their twin!"});
+                player.success = true;
+                targetPlayer.success = true;
             }
             else
-                roleMessages.push({role: playerRole , message: player.name + " did not find their twin"});
+                roleMessages.push({role: player.role , message: player.role + " did not find their twin"});
             break;
         case "MECHANIC":
             player.target = target;
-            roleMessages.push({role: playerRole, message: "You have found the robot"});
+            if(robots.indexOf(targetPlayer.role) != -1 && targetPlayer.state == 'active'){
+                player.success = true;
+                target.success = true;
+                roleMessages.push({role: player.role, message: "You succeeded by tinkering with the " + targetPlayer.role});
+                roleMessages.push({role: targetPlayer.role, message: "You have been tinkered by the " + player.role + "!"});
+            } else {
+                roleMessages.push({role: player.role, message: "You failed because you targetted the " + targetPlayer.role});
+            }
             break;
         case "GUARDIAN":
             if(targetPlayer.state != "active") return cb("You cannot protect them");
             player.target = target;
-            roleMessages.push({role: playerRole, message: "You protected " + targetPlayer.name});
+            roleMessages.push({role: player.role, message: "You protected " + targetPlayer.name});
             break;
         default:
             return cb("You broke the game.");
     }
         
 
-    // Do the role
-
-
     cb(null, {game:game, role:roleMessages});
+    // Find out if we should end
+    if(shouldEndRound(game)){
+        exports.eventEmitter.emit('timeout', game);
+    }
+};
+
+var shouldEndRound = function(game){
+    for(var p in game.players){
+        var player = game.players[p];
+        if(player.role == 'SNAKE' && player.target === null) continue;
+        if(player.state == 'active' && player.target === null) return false;
+        else if (player.role == 'SNAKE' && player.target === null) return false;
+    }
+    
+    return true;
+};
+
+var guardianSave = function(player, targetPlayer, guardianPlayer){
+    // Reverse them
+    guardianPlayer.success = true;
+    guardianPlayer.target = -1; // The only can help once
+    roleMessages.push({role: player.role, message: "You tried to kill the " + targetPlayer.role + " who was protected by the GUARDIAN"});
+    roleMessages.push({role: guardian.role, message: "You protected the " + targetPlayer.role + " who was going to be killed by the " + player.role + "!"});
 };
 
 exports.reset = function(cb){
