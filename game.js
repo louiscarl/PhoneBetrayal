@@ -68,7 +68,6 @@ var newGame = function(cb){
         timer:roundTimeLimit,
         players:[],
         state:"prep",
-        success:false,
         deckActions:deckActions
     };
     games.push(game);
@@ -120,6 +119,7 @@ exports.join = function(uuid, cb){
             name: names.shift() || uuid,
             role: "",
             state: 'active',
+            success: false,
             score: 0
         };
         playerToGame[player.id] = game.id;
