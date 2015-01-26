@@ -281,6 +281,11 @@ exports.playRole = function(playerId, target, cb){
             break;
         case "THE-BOMB":
             player.target = target;
+            if( guardianPlayer && guardianPlayer.target == target){
+                player.state = 'dead';
+                guardianSave(player, targetPlayer, guardianPlayer);
+                break;
+            }
             if(humans.indexOf(targetPlayer.role) != -1 && targetPlayer.state == 'active'){
                 player.success = true;
                 roleMessages.push({"role":player.role, "message":"You killed the human " + targetPlayer.role + "!"});
