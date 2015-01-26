@@ -150,6 +150,7 @@ module Betrayal {
             $scope.targetWhenDead = gameService.targetWhenDead();
             $scope.canAct = gameService.canAct;
             $scope.isAlive = gameService.player.state === 'active';
+            $scope.imgName = gameService.player.role.toLowerCase() + ($scope.isAlive ? "" : "_dead");
             var isTargetDisabled = !$scope.canAct || ($scope.targetWhenDead === $scope.isAlive);
             var otherPlayers = [];
             for (var i in gameService.otherPlayers) {
