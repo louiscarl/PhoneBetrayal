@@ -31,6 +31,7 @@ io.on('connection', function (socket) {
 
     // User Joins
     socket.on('join', function(user, cb){
+        console.log("Join called", user);
         var uuid = (user && user.uuid) ? user.uuid : socket.id;
         socketToUUID[socket.id] = uuid;
         // This is called manually when the client has loaded
