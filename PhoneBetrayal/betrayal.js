@@ -87,7 +87,7 @@ var Betrayal;
             $scope.players = players;
             $scope.playerName = gameService.player.name;
             $scope.role = gameService.player.role;
-            $scope.hasLost = gameService.player.success && gameService.player.role;
+            $scope.hasLost = !gameService.player.success && gameService.player.role;
             $scope.hasWon = gameService.player.success && gameService.player.role;
             $scope.isDisabled = $scope.players.length < 1;
         };
