@@ -29,7 +29,7 @@ h2.action {
   -webkit-animation: text_in_highlight 1s;
 }
 .background {
-  background: -webkit-linear-gradient(270deg, #002c4b 90%, #1a9481 100%);
+  background: linear-gradient(180deg, #002c4b 0%, #002c4b 90%, #1a9481 100%);
   z-index: -1;
   animation: horiz_move 10s infinite linear;
   -webkit-animation: horiz_move 10s infinite linear;
@@ -37,6 +37,27 @@ h2.action {
   width: 100%;
   position: absolute;
   transform: translate3d(0%, -100%, 0px);
+}
+@keyframes horiz_move {
+  0% {
+    transform: translate3d(0%, -100%, 0px);
+    opacity: 0;
+  }
+  5% {
+    transform: translate3d(0%, -100%, 0px);
+    opacity: 1;
+  }
+  10% {
+    transform: translate3d(0%, 50%, 0px);
+    opacity: 0.5;
+  }
+  20% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0%, 50%, 0px);
+    opacity: 0;
+  }
 }
 @-webkit-keyframes horiz_move {
   0% {
